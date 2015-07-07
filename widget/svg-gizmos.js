@@ -72,6 +72,24 @@ Editor.registerWidget( 'svg-gizmos', {
         });
         this._selectRect = null;
     },
+
+    rectHitTest: function(x, y, w, h) {
+        var rect = this._svg.node.createSVGRect();
+        rect.x = x;
+        rect.y = y;
+        rect.width = w;
+        rect.height = h;
+        var els = this._svg.node.getIntersectionList(rect, null);
+        var results = [];
+        for (var i = 0; i < els.length; ++i) {
+            var el = els[i];
+            var node = el.instance;
+            if (node && node.selectable) {
+                results.push(node);
+            }
+        }
+        return results;
+    },
 });
 
 })();
