@@ -1,0 +1,8 @@
+:host {
+    overflow: hidden;
+    position: relative;
+}
+
+svg {
+    shape-rendering: crispEdges;
+}

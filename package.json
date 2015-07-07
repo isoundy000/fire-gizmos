@@ -1,0 +1,12 @@
+{
+  "name": "ui-gizmos",
+  "version": "0.0.1",
+  "description": "Gizmos for scene editing",
+  "author": "Firebox Technology",
+  "hosts": {
+      "editor-framework": "^0.3.10"
+  },
+  "widgets": {
+    "svg-gizmos": "widget/svg-gizmos.html"
+  }
+}
