@@ -3,18 +3,37 @@ Editor.registerWidget( 'svg-gizmos', {
     is: 'svg-gizmos',
 
     properties: {
+        scale: {
+            type: Number,
+            value: 1.0,
+        },
+
+        transformTool: {
+            type: String,
+            value: 'move',
+        },
+
+        coordinate: {
+            type: String,
+            value: 'local',
+        },
+
+        pivot: {
+            type: String,
+            value: 'pivot',
+        },
     },
 
     created: function () {
-
     },
 
     ready: function () {
         this._svg = SVG(this.$.svg);
         this._svg.spof();
 
-        this._scene = this._svg.group();
         this._foreground = this._svg.group();
+
+        this.scene = this._svg.group();
 
         // TODO
         // this._gizmos = [];
@@ -29,7 +48,6 @@ Editor.registerWidget( 'svg-gizmos', {
 
     lightDomReady: function() {
         this.resize();
-        this.repaint();
     },
 
     resize: function ( w, h ) {
@@ -46,7 +64,20 @@ Editor.registerWidget( 'svg-gizmos', {
         this._svg.spof();
     },
 
-    repaint: function () {
+    update: function () {
+        if ( this._transformGizmo ) {
+            this._transformGizmo.update();
+        }
+    },
+
+    // override this function to make it work with your scene-view
+    sceneToPixel: function ( x, y ) {
+        return Fire.v2(x,y);
+    },
+
+    // override this function to make it work with your scene-view
+    pixelToScene: function ( x, y ) {
+        return Fire.v2(x,y);
     },
 
     updateSelectRect: function ( x, y, w, h ) {
@@ -89,6 +120,32 @@ Editor.registerWidget( 'svg-gizmos', {
             }
         }
         return results;
+    },
+
+    edit: function ( nodes ) {
+        if ( this._transformGizmo ) {
+            this._transformGizmo.remove();
+            this._transformGizmo = null;
+        }
+
+        if ( nodes.length === 0 ) {
+            return;
+        }
+
+        //
+        switch ( this.transformTool ) {
+            case 'move':
+                this._transformGizmo = new Editor.gizmos.move( this, nodes );
+            break;
+
+            case 'rotate':
+                this._transformGizmo = new Editor.gizmos.rotate( this, nodes );
+            break;
+
+            case 'scale':
+                this._transformGizmo = new Editor.gizmos.scale( this, nodes );
+            break;
+        }
     },
 });
 
