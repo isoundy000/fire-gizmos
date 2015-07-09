@@ -45,6 +45,10 @@ function _addMoveHandles ( gizmo, callbacks ) {
     } );
 }
 
+GizmosUtils.snapPixel = function (p) {
+    return Math.floor(p) + 0.5;
+};
+
 GizmosUtils.getCenter = function ( nodes ) {
     var minX = null, minY = null, maxX = null, maxY = null;
     for ( var i = 0; i < nodes.length; ++i ) {
@@ -81,7 +85,10 @@ GizmosUtils.getCenter = function ( nodes ) {
     var centerX = (minX + maxX) * 0.5;
     var centerY = (minY + maxY) * 0.5;
 
-    return Fire.v2( centerX, centerY );
+
+    var scene = Fire.engine.getCurrentScene();
+    var scenePos = scene.transformPointToLocal( Fire.v2(centerX,centerY) );
+    return scenePos;
 };
 
 GizmosUtils.scaleSlider = function ( svg, size, color, callbacks ) {
@@ -337,7 +344,7 @@ GizmosUtils.positionTool = function ( svg, callbacks ) {
                 callbacks.end.call(group);
         },
     } );
-    yarrow.translate( 20, 0 );
+    yarrow.translate( 0, -20 );
     yarrow.rotate(-90, 0, 0 );
     group.add(yarrow);
 
@@ -483,7 +490,7 @@ GizmosUtils.rotationTool = function ( svg, callbacks ) {
             arc.plot( 'M40,0 A40,40, 0 0,1 40,0 L0,0 Z' );
 
             txtDegree.plain("0\xB0");
-            txtDegree.rotate(0, 0, 0);
+            txtDegree.rotate(0, -30, 0);
             txtDegree.show();
 
             x1 = x - group.position.x;
@@ -510,7 +517,7 @@ GizmosUtils.rotationTool = function ( svg, callbacks ) {
                 var diry = Math.sin(alpha);
                 var angle = Math.rad2deg(alpha);
 
-                txtDegree.rotate(angle, 0, 0);
+                txtDegree.rotate(angle, -30, 0);
                 if ( alpha > 0.0 ) {
                     arc.plot( 'M40,0 A40,40, 0 0,1 ' + dirx*40 + ',' + diry*40 + ' L0,0' );
                     txtDegree.plain( "+" + angle.toFixed(0) + "\xB0" );

@@ -4,5 +4,5 @@
 }
 
 svg {
-    shape-rendering: crispEdges;
+    shape-rendering: geometricPrecision;
 }

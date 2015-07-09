@@ -11,16 +11,19 @@ Editor.registerWidget( 'svg-gizmos', {
         transformTool: {
             type: String,
             value: 'move',
+            observer: '_updateTransformGizmo'
         },
 
         coordinate: {
             type: String,
             value: 'local',
+            observer: '_updateTransformGizmo'
         },
 
         pivot: {
             type: String,
             value: 'pivot',
+            observer: '_updateTransformGizmo'
         },
     },
 
@@ -64,21 +67,17 @@ Editor.registerWidget( 'svg-gizmos', {
         this._svg.spof();
     },
 
-    update: function () {
+    repaint: function () {
         if ( this._transformGizmo ) {
-            this._transformGizmo.update();
+            this._transformGizmo.repaint();
         }
     },
 
     // override this function to make it work with your scene-view
-    sceneToPixel: function ( x, y ) {
-        return Fire.v2(x,y);
-    },
+    sceneToPixel: function ( x, y ) { return Fire.v2(x,y); },
 
     // override this function to make it work with your scene-view
-    pixelToScene: function ( x, y ) {
-        return Fire.v2(x,y);
-    },
+    pixelToScene: function ( x, y ) { return Fire.v2(x,y); },
 
     updateSelectRect: function ( x, y, w, h ) {
         if ( !this._selectRect ) {
@@ -86,7 +85,7 @@ Editor.registerWidget( 'svg-gizmos', {
         }
 
         this._selectRect
-            .move( x, y )
+            .move( Editor.GizmosUtils.snapPixel(x), Editor.GizmosUtils.snapPixel(y) )
             .size( w, h )
             .fill( { color: 'rgba(0,128,255,0.4)' } )
             .stroke( { width: 1, color: '#09f', opacity: 1.0 } )
@@ -145,6 +144,12 @@ Editor.registerWidget( 'svg-gizmos', {
             case 'scale':
                 this._transformGizmo = new Editor.gizmos.scale( this, nodes );
             break;
+        }
+    },
+
+    _updateTransformGizmo: function () {
+        if ( this._transformGizmo ) {
+            this.edit(this._transformGizmo._nodes);
         }
     },
 });
