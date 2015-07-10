@@ -36,9 +36,8 @@ Editor.registerWidget( 'svg-gizmos-view', {
         this._svg = SVG(this.$.svg);
         this._svg.spof();
 
-        this._foreground = this._svg.group();
-
         this.scene = this._svg.group();
+        this.foreground = this._svg.group();
     },
 
     attached: function () {
@@ -85,7 +84,7 @@ Editor.registerWidget( 'svg-gizmos-view', {
 
     updateSelectRect: function ( x, y, w, h ) {
         if ( !this._selectRect ) {
-            this._selectRect = this._foreground.rect();
+            this._selectRect = this.foreground.rect().front();
         }
 
         this._selectRect

@@ -8,7 +8,7 @@ function RotateGizmo ( gizmosView, nodes ) {
     this._nodes = nodes;
     this._rotating = false;
 
-    this._rotationTool = Editor.GizmosUtils.rotationTool( self._gizmosView.scene, {
+    this._rotationTool = Editor.GizmosUtils.rotationTool( self._gizmosView.foreground, {
         start: function () {
             var i;
 

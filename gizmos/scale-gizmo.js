@@ -7,7 +7,7 @@ function ScaleGizmo ( gizmosView, nodes ) {
     this._gizmosView = gizmosView;
     this._nodes = nodes;
 
-    this._scaleTool = Editor.GizmosUtils.scaleTool( self._gizmosView.scene, {
+    this._scaleTool = Editor.GizmosUtils.scaleTool( self._gizmosView.foreground, {
         start: function () {
             var i;
 

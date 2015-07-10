@@ -6,7 +6,7 @@ function ParticleGizmo ( gizmosView, node ) {
     this._node = node;
     this._gizmosView = gizmosView;
 
-    this._icon = Editor.GizmosUtils.icon(gizmosView.scene,
+    this._icon = Editor.GizmosUtils.icon(this._gizmosView.scene,
                                          'packages://ui-gizmos/static/particle-gizmo.png',
                                          40,
                                          40,

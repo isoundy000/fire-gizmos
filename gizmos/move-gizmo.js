@@ -6,7 +6,7 @@ function MoveGizmo ( gizmosView, nodes ) {
     this._gizmosView = gizmosView;
     this._nodes = nodes;
 
-    this._positionTool = Editor.GizmosUtils.positionTool( self._gizmosView.scene, {
+    this._positionTool = Editor.GizmosUtils.positionTool( self._gizmosView.foreground, {
         start: function () {
             scenePosList.length = 0;
             for (var i = 0; i < self._nodes.length; ++i) {
