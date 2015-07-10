@@ -7,4 +7,5 @@
     Editor.gizmos.scale = require('./gizmos/scale-gizmo');
 
     Editor.gizmos['Runtime.SpriteWrapper'] = require('./gizmos/sprite-gizmo');
+    Editor.gizmos['Runtime.ParticleWrapper'] = require('./gizmos/particle-gizmo');
 })();

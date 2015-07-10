@@ -66,12 +66,12 @@ ScaleGizmo.prototype.repaint = function () {
 
     if (this._gizmos.pivot === 'center') {
         scenePos = Editor.GizmosUtils.getCenter(this._nodes);
-        screenPos = this._gizmos.sceneToPixel(scenePos.x, scenePos.y);
+        screenPos = this._gizmos.sceneToPixel(scenePos);
         rotation = 0.0;
     }
     else {
         scenePos = activeTarget.scenePosition;
-        screenPos = this._gizmos.sceneToPixel(scenePos.x, scenePos.y);
+        screenPos = this._gizmos.sceneToPixel(scenePos);
         rotation = activeTarget.sceneRotation;
     }
 

@@ -72,16 +72,16 @@ Editor.registerWidget( 'svg-gizmos', {
     },
 
     // override this function to make it work with your scene-view
-    sceneToPixel: function ( x, y ) { return Fire.v2(x,y); },
+    sceneToPixel: function (v2) { return v2; },
 
     // override this function to make it work with your scene-view
-    worldToPixel: function ( x, y ) { return Fire.v2(x,y); },
+    worldToPixel: function (v2) { return v2; },
 
     // override this function to make it work with your scene-view
-    pixelToScene: function ( x, y ) { return Fire.v2(x,y); },
+    pixelToScene: function (v2) { return v2; },
 
     // override this function to make it work with your scene-view
-    pixelToWorld: function ( x, y ) { return Fire.v2(x,y); },
+    pixelToWorld: function (v2) { return v2; },
 
     updateSelectRect: function ( x, y, w, h ) {
         if ( !this._selectRect ) {

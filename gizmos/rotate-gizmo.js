@@ -59,7 +59,7 @@ function RotateGizmo ( gizmos, nodes ) {
         end: function () {
             if (self._gizmos.pivot === 'center') {
                 var scenePos = Editor.GizmosUtils.getCenter(nodes);
-                var screenPos = self._gizmos.sceneToPixel(scenePos.x, scenePos.y);
+                var screenPos = self._gizmos.sceneToPixel(scenePos);
 
                 screenPos.x = Editor.GizmosUtils.snapPixel(screenPos.x);
                 screenPos.y = Editor.GizmosUtils.snapPixel(screenPos.y);
@@ -88,11 +88,11 @@ RotateGizmo.prototype.repaint = function () {
         }
 
         scenePos = Editor.GizmosUtils.getCenter(this._nodes);
-        screenPos = this._gizmos.sceneToPixel(scenePos.x, scenePos.y);
+        screenPos = this._gizmos.sceneToPixel(scenePos);
     }
     else {
         scenePos = activeTarget.scenePosition;
-        screenPos = this._gizmos.sceneToPixel(scenePos.x, scenePos.y);
+        screenPos = this._gizmos.sceneToPixel(scenePos);
         rotation = activeTarget.sceneRotation;
     }
 

@@ -694,3 +694,28 @@ GizmosUtils.scaleTool = function ( svg, callbacks ) {
 
     return group;
 };
+
+GizmosUtils.icon = function ( svg, url, w, h, hoverNode ) {
+    var icon = svg.image(url)
+                         .move( -w * 0.5, -h * 0.5 )
+                         .size( w, h )
+                         ;
+
+    // icon.on( 'mousemove', function ( event ) {
+    //     event.stopPropagation();
+    // } );
+
+    icon.on( 'mouseover', function ( event ) {
+        // event.stopPropagation();
+        // var e = new CustomEvent('gizmoshover', {
+        //     detail: { entity: hoverEntity },
+        // } );
+        // this.node.dispatchEvent(e);
+    } );
+
+    // icon.on( 'mouseout', function ( event ) {
+    //     event.stopPropagation();
+    // } );
+
+    return icon;
+};
