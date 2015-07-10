@@ -197,6 +197,7 @@ Editor.registerWidget( 'svg-gizmos-view', {
                 this._transformGizmo.remove();
             }
             this._transformGizmo = new gizmoDef( this, nodes );
+            this._transformGizmo.repaint();
         }
     },
 

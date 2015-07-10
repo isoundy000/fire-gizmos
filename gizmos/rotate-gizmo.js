@@ -74,7 +74,6 @@ function RotateGizmo ( gizmosView, nodes ) {
             self._rotating = false;
         }
     });
-    this.repaint();
 }
 
 RotateGizmo.prototype.repaint = function () {

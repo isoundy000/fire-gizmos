@@ -57,7 +57,6 @@ function ScaleGizmo ( gizmosView, nodes ) {
             self.repaint();
         }
     });
-    this.repaint();
 }
 
 ScaleGizmo.prototype.repaint = function () {

@@ -24,7 +24,6 @@ function MoveGizmo ( gizmosView, nodes ) {
             self.repaint();
         }
     });
-    this.repaint();
 }
 
 MoveGizmo.prototype.repaint = function () {
