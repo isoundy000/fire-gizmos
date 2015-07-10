@@ -31,16 +31,14 @@ Editor.registerWidget( 'svg-gizmos', {
     },
 
     ready: function () {
+        this._selection = [];
+
         this._svg = SVG(this.$.svg);
         this._svg.spof();
 
         this._foreground = this._svg.group();
 
         this.scene = this._svg.group();
-
-        // TODO
-        // this._gizmos = [];
-        // this._gizmosTable = {}; // entity to gizmo
     },
 
     attached: function () {
@@ -77,7 +75,13 @@ Editor.registerWidget( 'svg-gizmos', {
     sceneToPixel: function ( x, y ) { return Fire.v2(x,y); },
 
     // override this function to make it work with your scene-view
+    worldToPixel: function ( x, y ) { return Fire.v2(x,y); },
+
+    // override this function to make it work with your scene-view
     pixelToScene: function ( x, y ) { return Fire.v2(x,y); },
+
+    // override this function to make it work with your scene-view
+    pixelToWorld: function ( x, y ) { return Fire.v2(x,y); },
 
     updateSelectRect: function ( x, y, w, h ) {
         if ( !this._selectRect ) {
@@ -121,6 +125,40 @@ Editor.registerWidget( 'svg-gizmos', {
         return results;
     },
 
+    select: function ( nodes ) {
+        this._selection = this._selection.concat(nodes);
+
+        var node;
+        for ( var i = 0; i < this._selection.length; ++i ) {
+            node = this._selection[i];
+            if ( node.gizmo ) {
+                node.gizmo.selecting = true;
+                node.gizmo.editing = false;
+            }
+        }
+
+        this.edit(this._selection);
+    },
+
+    unselect: function ( nodes ) {
+        for ( var i = 0; i < nodes.length; ++i ) {
+            var node = nodes[i];
+            for ( var j = 0; j < this._selection.length; ++j ) {
+                if ( this._selection[j].id === node.id ) {
+                    this._selection.splice(j,1);
+                    break;
+                }
+            }
+
+            if ( node.gizmo ) {
+                node.gizmo.selecting = false;
+                node.gizmo.editing = false;
+            }
+        }
+
+        this.edit(this._selection);
+    },
+
     edit: function ( nodes ) {
         if ( this._transformGizmo ) {
             this._transformGizmo.remove();
@@ -129,6 +167,14 @@ Editor.registerWidget( 'svg-gizmos', {
 
         if ( nodes.length === 0 ) {
             return;
+        }
+
+        if ( nodes.length === 1 ) {
+            node = nodes[0];
+            if ( node.gizmo ) {
+                node.gizmo.selecting = false;
+                node.gizmo.editing = true;
+            }
         }
 
         //
@@ -144,6 +190,18 @@ Editor.registerWidget( 'svg-gizmos', {
             case 'scale':
                 this._transformGizmo = new Editor.gizmos.scale( this, nodes );
             break;
+        }
+    },
+
+    hoverin: function ( node ) {
+        if ( node.gizmo ) {
+            node.gizmo.hovering = true;
+        }
+    },
+
+    hoverout: function ( node ) {
+        if ( node.gizmo ) {
+            node.gizmo.hovering = false;
         }
     },
 
