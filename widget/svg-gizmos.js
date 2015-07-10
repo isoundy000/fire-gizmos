@@ -160,12 +160,10 @@ Editor.registerWidget( 'svg-gizmos', {
     },
 
     edit: function ( nodes ) {
-        if ( this._transformGizmo ) {
-            this._transformGizmo.remove();
-            this._transformGizmo = null;
-        }
-
         if ( nodes.length === 0 ) {
+            if ( this._transformGizmo ) {
+                this._transformGizmo._nodes = [];
+            }
             return;
         }
 
@@ -177,19 +175,28 @@ Editor.registerWidget( 'svg-gizmos', {
             }
         }
 
+        var gizmoDef;
+
         //
         switch ( this.transformTool ) {
-            case 'move':
-                this._transformGizmo = new Editor.gizmos.move( this, nodes );
-            break;
+            case 'move': gizmoDef = Editor.gizmos.move; break;
+            case 'rotate': gizmoDef = Editor.gizmos.rotate; break;
+            case 'scale': gizmoDef = Editor.gizmos.scale; break;
+        }
 
-            case 'rotate':
-                this._transformGizmo = new Editor.gizmos.rotate( this, nodes );
-            break;
+        if ( !gizmoDef ) {
+            Editor.error( 'Unknown transform tool %s', this.transformTool );
+            return;
+        }
 
-            case 'scale':
-                this._transformGizmo = new Editor.gizmos.scale( this, nodes );
-            break;
+        if ( this._transformGizmo && this._transformGizmo instanceof gizmoDef ) {
+            this._transformGizmo._nodes = nodes;
+        }
+        else {
+            if ( this._transformGizmo ) {
+                this._transformGizmo.remove();
+            }
+            this._transformGizmo = new gizmoDef( this, nodes );
         }
     },
 

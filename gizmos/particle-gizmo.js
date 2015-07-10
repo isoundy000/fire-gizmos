@@ -14,7 +14,7 @@ function ParticleGizmo ( gizmos, node ) {
 }
 
 ParticleGizmo.prototype.repaint = function () {
-    var s = Math.max(this._gizmos.scale, 0.5);
+    var s = Math.clamp(this._gizmos.scale, 0.5, 2);
 
     var screenPos = this._gizmos.sceneToPixel(this._node.scenePosition);
     screenPos.x = Editor.GizmosUtils.snapPixel(screenPos.x);

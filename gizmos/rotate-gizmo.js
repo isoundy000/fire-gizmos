@@ -8,22 +8,22 @@ function RotateGizmo ( gizmos, nodes ) {
     this._nodes = nodes;
     this._rotating = false;
 
-    this._rotationTool = Editor.GizmosUtils.rotationTool( gizmos.scene, {
+    this._rotationTool = Editor.GizmosUtils.rotationTool( self._gizmos.scene, {
         start: function () {
             var i;
 
             self._rotating = true;
             rotList = [];
 
-            for (i = 0; i < nodes.length; ++i) {
-                rotList.push(nodes[i].rotation);
+            for (i = 0; i < self._nodes.length; ++i) {
+                rotList.push(self._nodes[i].rotation);
             }
 
             if (self._gizmos.pivot === 'center') {
-                center = Editor.GizmosUtils.getCenter(nodes);
+                center = Editor.GizmosUtils.getCenter(self._nodes);
                 offsetList.length = 0;
-                for (i = 0; i < nodes.length; ++i) {
-                    offsetList.push(nodes[i].scenePosition.sub(center));
+                for (i = 0; i < self._nodes.length; ++i) {
+                    offsetList.push(self._nodes[i].scenePosition.sub(center));
                 }
             }
         },
@@ -39,8 +39,8 @@ function RotateGizmo ( gizmos, nodes ) {
                     rot = Math.floor(rot);
 
                     var offset = offsetList[i].rotate(Math.deg2rad(deltaInt));
-                    nodes[i].scenePosition = center.add(offset);
-                    nodes[i].rotation = rot;
+                    self._nodes[i].scenePosition = center.add(offset);
+                    self._nodes[i].rotation = rot;
 
                     this.rotation = -delta;
                 }
@@ -49,7 +49,7 @@ function RotateGizmo ( gizmos, nodes ) {
                 for (i = 0; i < rotList.length; ++i) {
                     rot = Math.deg180(rotList[i] - deltaInt);
                     rot = Math.floor(rot);
-                    nodes[i].rotation = rot;
+                    self._nodes[i].rotation = rot;
                 }
             }
 
@@ -58,7 +58,7 @@ function RotateGizmo ( gizmos, nodes ) {
 
         end: function () {
             if (self._gizmos.pivot === 'center') {
-                var scenePos = Editor.GizmosUtils.getCenter(nodes);
+                var scenePos = Editor.GizmosUtils.getCenter(self._nodes);
                 var screenPos = self._gizmos.sceneToPixel(scenePos);
 
                 screenPos.x = Editor.GizmosUtils.snapPixel(screenPos.x);
@@ -78,6 +78,13 @@ function RotateGizmo ( gizmos, nodes ) {
 }
 
 RotateGizmo.prototype.repaint = function () {
+    if ( this._nodes.length === 0 ) {
+        this._rotationTool.hide();
+        return;
+    }
+
+    this._rotationTool.show();
+
     var activeTarget = this._nodes[0];
     var scenePos, screenPos, rotation;
 

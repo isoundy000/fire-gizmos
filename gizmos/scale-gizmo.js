@@ -7,21 +7,21 @@ function ScaleGizmo ( gizmos, nodes ) {
     this._gizmos = gizmos;
     this._nodes = nodes;
 
-    this._scaleTool = Editor.GizmosUtils.scaleTool( gizmos.scene, {
+    this._scaleTool = Editor.GizmosUtils.scaleTool( self._gizmos.scene, {
         start: function () {
             var i;
 
             localscaleList = [];
 
-            for (i = 0; i < nodes.length; ++i) {
-                localscaleList.push(nodes[i].scale);
+            for (i = 0; i < self._nodes.length; ++i) {
+                localscaleList.push(self._nodes[i].scale);
             }
 
             if (self._gizmos.pivot === 'center') {
-                center = Editor.GizmosUtils.getCenter(nodes);
+                center = Editor.GizmosUtils.getCenter(self._nodes);
                 offsetList.length = 0;
-                for (i = 0; i < nodes.length; ++i) {
-                    offsetList.push(nodes[i].scenePosition.sub(center));
+                for (i = 0; i < self._nodes.length; ++i) {
+                    offsetList.push(self._nodes[i].scenePosition.sub(center));
                 }
             }
         },
@@ -33,7 +33,7 @@ function ScaleGizmo ( gizmos, nodes ) {
 
             if (self._gizmos.pivot === 'center') {
                 for (i = 0; i < localscaleList.length; ++i) {
-                    nodes[i].scale = Fire.v2(
+                    self._nodes[i].scale = Fire.v2(
                         localscaleList[i].x * scale.x,
                         localscaleList[i].y * scale.y
                     );
@@ -42,12 +42,12 @@ function ScaleGizmo ( gizmos, nodes ) {
                         offsetList[i].x * scale.x,
                         offsetList[i].y * scale.y
                     );
-                    nodes[i].scenePosition = center.add(offset);
+                    self._nodes[i].scenePosition = center.add(offset);
                 }
             }
             else {
                 for (i = 0; i < localscaleList.length; ++i) {
-                    nodes[i].scale = Fire.v2(
+                    self._nodes[i].scale = Fire.v2(
                         localscaleList[i].x * scale.x,
                         localscaleList[i].y * scale.y
                     );
@@ -61,6 +61,13 @@ function ScaleGizmo ( gizmos, nodes ) {
 }
 
 ScaleGizmo.prototype.repaint = function () {
+    if ( this._nodes.length === 0 ) {
+        this._scaleTool.hide();
+        return;
+    }
+
+    this._scaleTool.show();
+
     var activeTarget = this._nodes[0];
     var worldpos, screenpos, rotation;
 

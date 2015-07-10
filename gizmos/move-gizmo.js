@@ -6,19 +6,19 @@ function MoveGizmo ( gizmos, nodes ) {
     this._gizmos = gizmos;
     this._nodes = nodes;
 
-    this._positionTool = Editor.GizmosUtils.positionTool( gizmos.scene, {
+    this._positionTool = Editor.GizmosUtils.positionTool( self._gizmos.scene, {
         start: function () {
             scenePosList.length = 0;
-            for (var i = 0; i < nodes.length; ++i) {
-                scenePosList.push(nodes[i].scenePosition);
+            for (var i = 0; i < self._nodes.length; ++i) {
+                scenePosList.push(self._nodes[i].scenePosition);
             }
         },
 
         update: function (dx, dy) {
-            var delta = new Fire.Vec2(dx / gizmos.scale, -dy / gizmos.scale);
+            var delta = new Fire.Vec2(dx / self._gizmos.scale, -dy / self._gizmos.scale);
 
             for (var i = 0; i < scenePosList.length; ++i) {
-                nodes[i].scenePosition = scenePosList[i].add(delta);
+                self._nodes[i].scenePosition = scenePosList[i].add(delta);
             }
 
             self.repaint();
@@ -28,6 +28,13 @@ function MoveGizmo ( gizmos, nodes ) {
 }
 
 MoveGizmo.prototype.repaint = function () {
+    if ( this._nodes.length === 0 ) {
+        this._positionTool.hide();
+        return;
+    }
+
+    this._positionTool.show();
+
     var activeTarget = this._nodes[0];
     var scenePos, screenPos, rotation;
 
