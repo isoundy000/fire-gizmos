@@ -1,16 +1,16 @@
-function SpriteGizmo ( gizmos, node ) {
+function SpriteGizmo ( gizmosView, node ) {
     this.hovering = false;
     this.selecting = false;
     this.editing = false;
 
     this._node = node;
-    this._gizmos = gizmos;
+    this._gizmosView = gizmosView;
     this._selectTool = null;
 }
 
 SpriteGizmo.prototype.ensureSelectTool = function () {
     if ( !this._selectTool ) {
-        this._selectTool = this._gizmos.scene.polygon();
+        this._selectTool = this._gizmosView.scene.polygon();
     }
 };
 
@@ -27,10 +27,10 @@ SpriteGizmo.prototype.repaint = function () {
         this.ensureSelectTool();
 
         bounds = this._node.getWorldOrientedBounds();
-        v1 = this._gizmos.worldToPixel(bounds[0]);
-        v2 = this._gizmos.worldToPixel(bounds[1]);
-        v3 = this._gizmos.worldToPixel(bounds[2]);
-        v4 = this._gizmos.worldToPixel(bounds[3]);
+        v1 = this._gizmosView.worldToPixel(bounds[0]);
+        v2 = this._gizmosView.worldToPixel(bounds[1]);
+        v3 = this._gizmosView.worldToPixel(bounds[2]);
+        v4 = this._gizmosView.worldToPixel(bounds[3]);
 
         this._selectTool.show();
         this._selectTool.plot([
@@ -49,10 +49,10 @@ SpriteGizmo.prototype.repaint = function () {
         this.ensureSelectTool();
 
         bounds = this._node.getWorldOrientedBounds();
-        v1 = this._gizmos.worldToPixel(bounds[0]);
-        v2 = this._gizmos.worldToPixel(bounds[1]);
-        v3 = this._gizmos.worldToPixel(bounds[2]);
-        v4 = this._gizmos.worldToPixel(bounds[3]);
+        v1 = this._gizmosView.worldToPixel(bounds[0]);
+        v2 = this._gizmosView.worldToPixel(bounds[1]);
+        v3 = this._gizmosView.worldToPixel(bounds[2]);
+        v4 = this._gizmosView.worldToPixel(bounds[3]);
 
         this._selectTool.show();
         this._selectTool.plot([

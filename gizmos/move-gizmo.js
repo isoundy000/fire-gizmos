@@ -1,12 +1,12 @@
-function MoveGizmo ( gizmos, nodes ) {
+function MoveGizmo ( gizmosView, nodes ) {
     var scenePosList = [],
         self = this
         ;
 
-    this._gizmos = gizmos;
+    this._gizmosView = gizmosView;
     this._nodes = nodes;
 
-    this._positionTool = Editor.GizmosUtils.positionTool( self._gizmos.scene, {
+    this._positionTool = Editor.GizmosUtils.positionTool( self._gizmosView.scene, {
         start: function () {
             scenePosList.length = 0;
             for (var i = 0; i < self._nodes.length; ++i) {
@@ -15,7 +15,7 @@ function MoveGizmo ( gizmos, nodes ) {
         },
 
         update: function (dx, dy) {
-            var delta = new Fire.Vec2(dx / self._gizmos.scale, -dy / self._gizmos.scale);
+            var delta = new Fire.Vec2(dx / self._gizmosView.scale, -dy / self._gizmosView.scale);
 
             for (var i = 0; i < scenePosList.length; ++i) {
                 self._nodes[i].scenePosition = scenePosList[i].add(delta);
@@ -38,14 +38,14 @@ MoveGizmo.prototype.repaint = function () {
     var activeTarget = this._nodes[0];
     var scenePos, screenPos, rotation;
 
-    if (this._gizmos.pivot === 'center') {
+    if (this._gizmosView.pivot === 'center') {
         scenePos = Editor.GizmosUtils.getCenter(this._nodes);
-        screenPos = this._gizmos.sceneToPixel(scenePos);
+        screenPos = this._gizmosView.sceneToPixel(scenePos);
         rotation = 0.0;
     }
     else {
         scenePos = activeTarget.scenePosition;
-        screenPos = this._gizmos.sceneToPixel(scenePos);
+        screenPos = this._gizmosView.sceneToPixel(scenePos);
         rotation = 0.0;
 
         if ( this.coordinate !== 'global' ) {

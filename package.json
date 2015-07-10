@@ -7,6 +7,6 @@
       "editor-framework": "^0.3.10"
   },
   "widgets": {
-    "svg-gizmos": "widget/svg-gizmos.html"
+    "svg-gizmos-view": "widget/svg-gizmos-view.html"
   }
 }

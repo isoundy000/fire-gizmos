@@ -1,12 +1,12 @@
-function ParticleGizmo ( gizmos, node ) {
+function ParticleGizmo ( gizmosView, node ) {
     this.hovering = false;
     this.selecting = false;
     this.editing = false;
 
     this._node = node;
-    this._gizmos = gizmos;
+    this._gizmosView = gizmosView;
 
-    this._icon = Editor.GizmosUtils.icon(gizmos.scene,
+    this._icon = Editor.GizmosUtils.icon(gizmosView.scene,
                                          'packages://ui-gizmos/static/particle-gizmo.png',
                                          40,
                                          40,
@@ -14,9 +14,9 @@ function ParticleGizmo ( gizmos, node ) {
 }
 
 ParticleGizmo.prototype.repaint = function () {
-    var s = Math.clamp(this._gizmos.scale, 0.5, 2);
+    var s = Math.clamp(this._gizmosView.scale, 0.5, 2);
 
-    var screenPos = this._gizmos.sceneToPixel(this._node.scenePosition);
+    var screenPos = this._gizmosView.sceneToPixel(this._node.scenePosition);
     screenPos.x = Editor.GizmosUtils.snapPixel(screenPos.x);
     screenPos.y = Editor.GizmosUtils.snapPixel(screenPos.y);
     var rotation = this._node.sceneRotation;

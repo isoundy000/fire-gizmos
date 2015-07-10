@@ -1,6 +1,6 @@
 (function () {
-Editor.registerWidget( 'svg-gizmos', {
-    is: 'svg-gizmos',
+Editor.registerWidget( 'svg-gizmos-view', {
+    is: 'svg-gizmos-view',
 
     properties: {
         scale: {
