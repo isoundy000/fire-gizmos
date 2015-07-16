@@ -13,7 +13,7 @@ function ParticleGizmo ( gizmosView, node ) {
                                          node);
 }
 
-ParticleGizmo.prototype.repaint = function () {
+ParticleGizmo.prototype.update = function () {
     var s = Math.clamp(this._gizmosView.scale, 0.5, 2);
 
     var screenPos = this._gizmosView.sceneToPixel(this._node.scenePosition);

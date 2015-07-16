@@ -20,7 +20,7 @@ SpriteGizmo.prototype.hideSelectTool = function () {
     }
 };
 
-SpriteGizmo.prototype.repaint = function () {
+SpriteGizmo.prototype.update = function () {
     var bounds, v1, v2, v3, v4;
 
     if ( !this.textureUuid ) {

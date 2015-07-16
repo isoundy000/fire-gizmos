@@ -54,12 +54,12 @@ function ScaleGizmo ( gizmosView, nodes ) {
                 }
             }
 
-            self.repaint();
+            Fire.engine.repaintInEditMode();
         }
     });
 }
 
-ScaleGizmo.prototype.repaint = function () {
+ScaleGizmo.prototype.update = function () {
     if ( this._nodes.length === 0 ) {
         this._scaleTool.hide();
         return;

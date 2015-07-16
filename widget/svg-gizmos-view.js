@@ -64,9 +64,9 @@ Editor.registerWidget( 'svg-gizmos-view', {
         this._svg.spof();
     },
 
-    repaint: function () {
+    update: function () {
         if ( this._transformGizmo ) {
-            this._transformGizmo.repaint();
+            this._transformGizmo.update();
         }
     },
 
@@ -163,6 +163,7 @@ Editor.registerWidget( 'svg-gizmos-view', {
             if ( this._transformGizmo ) {
                 this._transformGizmo._nodes = [];
             }
+            Fire.engine.repaintInEditMode();
             return;
         }
 
@@ -185,6 +186,7 @@ Editor.registerWidget( 'svg-gizmos-view', {
 
         if ( !gizmoDef ) {
             Editor.error( 'Unknown transform tool %s', this.transformTool );
+            Fire.engine.repaintInEditMode();
             return;
         }
 
@@ -196,19 +198,23 @@ Editor.registerWidget( 'svg-gizmos-view', {
                 this._transformGizmo.remove();
             }
             this._transformGizmo = new gizmoDef( this, nodes );
-            this._transformGizmo.repaint();
+            this._transformGizmo.update();
         }
+
+        Fire.engine.repaintInEditMode();
     },
 
     hoverin: function ( node ) {
         if ( node.gizmo ) {
             node.gizmo.hovering = true;
+            Fire.engine.repaintInEditMode();
         }
     },
 
     hoverout: function ( node ) {
         if ( node.gizmo ) {
             node.gizmo.hovering = false;
+            Fire.engine.repaintInEditMode();
         }
     },
 

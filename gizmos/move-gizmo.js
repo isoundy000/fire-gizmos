@@ -21,12 +21,12 @@ function MoveGizmo ( gizmosView, nodes ) {
                 self._nodes[i].scenePosition = scenePosList[i].add(delta);
             }
 
-            self.repaint();
+            Fire.engine.repaintInEditMode();
         }
     });
 }
 
-MoveGizmo.prototype.repaint = function () {
+MoveGizmo.prototype.update = function () {
     if ( this._nodes.length === 0 ) {
         this._positionTool.hide();
         return;

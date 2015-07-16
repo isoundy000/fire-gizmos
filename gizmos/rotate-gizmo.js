@@ -53,7 +53,7 @@ function RotateGizmo ( gizmosView, nodes ) {
                 }
             }
 
-            self.repaint();
+            Fire.engine.repaintInEditMode();
         },
 
         end: function () {
@@ -76,7 +76,7 @@ function RotateGizmo ( gizmosView, nodes ) {
     });
 }
 
-RotateGizmo.prototype.repaint = function () {
+RotateGizmo.prototype.update = function () {
     if ( this._nodes.length === 0 ) {
         this._rotationTool.hide();
         return;
