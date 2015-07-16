@@ -70,6 +70,12 @@ Editor.registerWidget( 'svg-gizmos-view', {
         }
     },
 
+    repaintHost: function () {
+        if ( Fire.engine ) {
+            Fire.engine.repaintInEditMode();
+        }
+    },
+
     // override this function to make it work with your scene-view
     sceneToPixel: function (v2) { return v2; },
 
@@ -163,7 +169,7 @@ Editor.registerWidget( 'svg-gizmos-view', {
             if ( this._transformGizmo ) {
                 this._transformGizmo._nodes = [];
             }
-            Fire.engine.repaintInEditMode();
+            this.repaintHost();
             return;
         }
 
@@ -186,7 +192,7 @@ Editor.registerWidget( 'svg-gizmos-view', {
 
         if ( !gizmoDef ) {
             Editor.error( 'Unknown transform tool %s', this.transformTool );
-            Fire.engine.repaintInEditMode();
+            this.repaintHost();
             return;
         }
 
@@ -201,20 +207,20 @@ Editor.registerWidget( 'svg-gizmos-view', {
             this._transformGizmo.update();
         }
 
-        Fire.engine.repaintInEditMode();
+        this.repaintHost();
     },
 
     hoverin: function ( node ) {
         if ( node.gizmo ) {
             node.gizmo.hovering = true;
-            Fire.engine.repaintInEditMode();
+            this.repaintHost();
         }
     },
 
     hoverout: function ( node ) {
         if ( node.gizmo ) {
             node.gizmo.hovering = false;
-            Fire.engine.repaintInEditMode();
+            this.repaintHost();
         }
     },
 

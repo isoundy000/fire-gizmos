@@ -21,7 +21,7 @@ function MoveGizmo ( gizmosView, nodes ) {
                 self._nodes[i].scenePosition = scenePosList[i].add(delta);
             }
 
-            Fire.engine.repaintInEditMode();
+            self._gizmosView.repaintHost();
         }
     });
 }

@@ -54,7 +54,7 @@ function ScaleGizmo ( gizmosView, nodes ) {
                 }
             }
 
-            Fire.engine.repaintInEditMode();
+            self._gizmosView.repaintHost();
         }
     });
 }

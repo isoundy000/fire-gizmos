@@ -53,7 +53,7 @@ function RotateGizmo ( gizmosView, nodes ) {
                 }
             }
 
-            Fire.engine.repaintInEditMode();
+            self._gizmosView.repaintHost();
         },
 
         end: function () {
