@@ -132,6 +132,10 @@ Editor.registerWidget( 'svg-gizmos-view', {
 
     reset: function () {
         this._selection = [];
+        if ( this._transformGizmo ) {
+            this._transformGizmo.remove();
+            this._transformGizmo = null;
+        }
         this.scene.clear();
         this.foreground.clear();
     },
@@ -139,10 +143,9 @@ Editor.registerWidget( 'svg-gizmos-view', {
     select: function ( nodes ) {
         this._selection = this._selection.concat(nodes);
 
-        var node;
         for ( var i = 0; i < this._selection.length; ++i ) {
-            node = this._selection[i];
-            if ( node.gizmo ) {
+            var node = this._selection[i];
+            if ( node && node.gizmo ) {
                 node.gizmo.selecting = true;
                 node.gizmo.editing = false;
             }
@@ -154,16 +157,18 @@ Editor.registerWidget( 'svg-gizmos-view', {
     unselect: function ( nodes ) {
         for ( var i = 0; i < nodes.length; ++i ) {
             var node = nodes[i];
-            for ( var j = 0; j < this._selection.length; ++j ) {
-                if ( this._selection[j].id === node.id ) {
-                    this._selection.splice(j,1);
-                    break;
+            if ( node ) {
+                for ( var j = 0; j < this._selection.length; ++j ) {
+                    if ( this._selection[j].id === node.id ) {
+                        this._selection.splice(j,1);
+                        break;
+                    }
                 }
-            }
 
-            if ( node.gizmo ) {
-                node.gizmo.selecting = false;
-                node.gizmo.editing = false;
+                if ( node.gizmo ) {
+                    node.gizmo.selecting = false;
+                    node.gizmo.editing = false;
+                }
             }
         }
 
