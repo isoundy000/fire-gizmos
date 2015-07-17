@@ -130,6 +130,12 @@ Editor.registerWidget( 'svg-gizmos-view', {
         return results;
     },
 
+    reset: function () {
+        this._selection = [];
+        this.scene.clear();
+        this.foreground.clear();
+    },
+
     select: function ( nodes ) {
         this._selection = this._selection.concat(nodes);
 
