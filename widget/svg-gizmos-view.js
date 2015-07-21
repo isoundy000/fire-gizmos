@@ -25,6 +25,13 @@ Editor.registerWidget( 'svg-gizmos-view', {
             value: 'pivot',
             observer: '_updateTransformGizmo'
         },
+
+        designSize: {
+            type: Array,
+            value: function () {
+                return [ 640, 480 ];
+            }
+        },
     },
 
     created: function () {
@@ -36,6 +43,7 @@ Editor.registerWidget( 'svg-gizmos-view', {
         this._svg = SVG(this.$.svg);
         this._svg.spof();
 
+        this.background = this._svg.group();
         this.scene = this._svg.group();
         this.foreground = this._svg.group();
     },
@@ -68,6 +76,8 @@ Editor.registerWidget( 'svg-gizmos-view', {
         if ( this._transformGizmo ) {
             this._transformGizmo.update();
         }
+
+        this.updateDesignRect();
     },
 
     repaintHost: function () {
@@ -87,6 +97,36 @@ Editor.registerWidget( 'svg-gizmos-view', {
 
     // override this function to make it work with your scene-view
     pixelToWorld: function (v2) { return v2; },
+
+    updateDesignRect: function () {
+        if ( !this._designRect ) {
+            this._designRect = this.background.rect().back();
+        }
+
+        var start = this.sceneToPixel( Fire.v2(0,0) );
+        var end = this.sceneToPixel( Fire.v2(this.designSize[0],this.designSize[1]) );
+
+        var x = Editor.GizmosUtils.snapPixel(start.x);
+        var y = Editor.GizmosUtils.snapPixel(start.y);
+        var w = Editor.GizmosUtils.snapPixel(end.x) - x;
+        var h = Editor.GizmosUtils.snapPixel(end.y) - y;
+
+        if ( w < 0.0 ) {
+            x += w;
+            w = -w;
+        }
+        if ( h < 0.0 ) {
+            y += h;
+            h = -h;
+        }
+
+        this._designRect
+            .move( x, y )
+            .size( w, h )
+            .fill( { opacity: 0.0 } )
+            .stroke( { width: 1, color: '#f0f', opacity: 0.8 } )
+            ;
+    },
 
     updateSelectRect: function ( x, y, w, h ) {
         if ( !this._selectRect ) {
@@ -136,6 +176,16 @@ Editor.registerWidget( 'svg-gizmos-view', {
             this._transformGizmo.remove();
             this._transformGizmo = null;
         }
+        if ( this._selectRect ) {
+            this._selectRect.remove();
+            this._selectRect = null;
+        }
+        if ( this._designRect ) {
+            this._designRect.remove();
+            this._designRect = null;
+        }
+
+        this.background.clear();
         this.scene.clear();
         this.foreground.clear();
     },
