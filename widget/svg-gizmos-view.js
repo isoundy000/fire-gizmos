@@ -209,7 +209,7 @@ Editor.registerWidget( 'svg-gizmos-view', {
             var node = nodes[i];
             if ( node ) {
                 for ( var j = 0; j < this._selection.length; ++j ) {
-                    if ( this._selection[j].id === node.id ) {
+                    if ( this._selection[j].uuid === node.uuid ) {
                         this._selection.splice(j,1);
                         break;
                     }
