@@ -190,39 +190,48 @@ Editor.registerWidget( 'svg-gizmos-view', {
         this.foreground.clear();
     },
 
-    select: function ( nodes ) {
-        this._selection = this._selection.concat(nodes);
+    select: function ( ids ) {
+        this._selection = this._selection.concat(ids);
+        var nodes = [];
 
         for ( var i = 0; i < this._selection.length; ++i ) {
-            var node = this._selection[i];
+            var id = this._selection[i];
+            var node = Fire.engine.getInstanceById(id);
+
             if ( node && node.gizmo ) {
                 node.gizmo.selecting = true;
                 node.gizmo.editing = false;
             }
+            nodes.push(node);
         }
 
-        this.edit(this._selection);
+        this.edit(nodes);
     },
 
-    unselect: function ( nodes ) {
-        for ( var i = 0; i < nodes.length; ++i ) {
-            var node = nodes[i];
-            if ( node ) {
-                for ( var j = 0; j < this._selection.length; ++j ) {
-                    if ( this._selection[j].uuid === node.uuid ) {
-                        this._selection.splice(j,1);
-                        break;
-                    }
+    unselect: function ( ids ) {
+        for ( var i = 0; i < ids.length; ++i ) {
+            var id = ids[i];
+            for ( var j = 0; j < this._selection.length; ++j ) {
+                if ( this._selection[j] === id ) {
+                    this._selection.splice(j,1);
+                    break;
                 }
+            }
 
-                if ( node.gizmo ) {
-                    node.gizmo.selecting = false;
-                    node.gizmo.editing = false;
-                }
+            var node = Fire.engine.getInstanceById(id);
+            if ( node && node.gizmo ) {
+                node.gizmo.selecting = false;
+                node.gizmo.editing = false;
             }
         }
 
-        this.edit(this._selection);
+
+        var nodes = this._selection.map(function ( id ) {
+            var node = Fire.engine.getInstanceById(id);
+            return node;
+        });
+
+        this.edit(nodes);
     },
 
     edit: function ( nodes ) {
