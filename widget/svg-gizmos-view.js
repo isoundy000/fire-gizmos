@@ -225,7 +225,6 @@ Editor.registerWidget( 'svg-gizmos-view', {
             }
         }
 
-
         var nodes = this._selection.map(function ( id ) {
             var node = Fire.engine.getInstanceById(id);
             return node;
@@ -251,9 +250,8 @@ Editor.registerWidget( 'svg-gizmos-view', {
             }
         }
 
-        var gizmoDef;
-
         //
+        var gizmoDef;
         switch ( this.transformTool ) {
             case 'move': gizmoDef = Editor.gizmos.move; break;
             case 'rotate': gizmoDef = Editor.gizmos.rotate; break;
@@ -280,15 +278,17 @@ Editor.registerWidget( 'svg-gizmos-view', {
         this.repaintHost();
     },
 
-    hoverin: function ( node ) {
-        if ( node.gizmo ) {
+    hoverin: function ( id ) {
+        var node = Fire.engine.getInstanceById(id);
+        if ( node && node.gizmo ) {
             node.gizmo.hovering = true;
             this.repaintHost();
         }
     },
 
-    hoverout: function ( node ) {
-        if ( node.gizmo ) {
+    hoverout: function ( id ) {
+        var node = Fire.engine.getInstanceById(id);
+        if ( node && node.gizmo ) {
             node.gizmo.hovering = false;
             this.repaintHost();
         }
