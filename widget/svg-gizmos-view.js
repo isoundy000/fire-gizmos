@@ -1,7 +1,5 @@
 (function () {
-Editor.registerWidget( 'svg-gizmos-view', {
-    is: 'svg-gizmos-view',
-
+Editor.registerElement({
     properties: {
         scale: {
             type: Number,
