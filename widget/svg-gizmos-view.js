@@ -79,8 +79,8 @@ Editor.registerElement({
     },
 
     repaintHost: function () {
-        if ( Fire.engine ) {
-            Fire.engine.repaintInEditMode();
+        if ( cc.engine ) {
+            cc.engine.repaintInEditMode();
         }
     },
 
@@ -101,8 +101,8 @@ Editor.registerElement({
             this._designRect = this.background.rect().back();
         }
 
-        var start = this.sceneToPixel( Fire.v2(0,0) );
-        var end = this.sceneToPixel( Fire.v2(this.designSize[0],this.designSize[1]) );
+        var start = this.sceneToPixel( cc.v2(0,0) );
+        var end = this.sceneToPixel( cc.v2(this.designSize[0],this.designSize[1]) );
 
         var x = Editor.GizmosUtils.snapPixel(start.x);
         var y = Editor.GizmosUtils.snapPixel(start.y);
@@ -194,7 +194,7 @@ Editor.registerElement({
 
         for ( var i = 0; i < this._selection.length; ++i ) {
             var id = this._selection[i];
-            var node = Fire.engine.getInstanceById(id);
+            var node = cc.engine.getInstanceById(id);
 
             if ( node && node.gizmo ) {
                 node.gizmo.selecting = true;
@@ -216,7 +216,7 @@ Editor.registerElement({
                 }
             }
 
-            var node = Fire.engine.getInstanceById(id);
+            var node = cc.engine.getInstanceById(id);
             if ( node && node.gizmo ) {
                 node.gizmo.selecting = false;
                 node.gizmo.editing = false;
@@ -224,7 +224,7 @@ Editor.registerElement({
         }
 
         var nodes = this._selection.map(function ( id ) {
-            var node = Fire.engine.getInstanceById(id);
+            var node = cc.engine.getInstanceById(id);
             return node;
         });
 
@@ -277,7 +277,7 @@ Editor.registerElement({
     },
 
     hoverin: function ( id ) {
-        var node = Fire.engine.getInstanceById(id);
+        var node = cc.engine.getInstanceById(id);
         if ( node && node.gizmo ) {
             node.gizmo.hovering = true;
             this.repaintHost();
@@ -285,7 +285,7 @@ Editor.registerElement({
     },
 
     hoverout: function ( id ) {
-        var node = Fire.engine.getInstanceById(id);
+        var node = cc.engine.getInstanceById(id);
         if ( node && node.gizmo ) {
             node.gizmo.hovering = false;
             this.repaintHost();

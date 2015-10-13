@@ -29,16 +29,16 @@ function ScaleGizmo ( gizmosView, nodes ) {
         update: function (dx, dy) {
             var i, scale;
 
-            scale = Fire.v2(1.0 + dx, 1.0 - dy);
+            scale = cc.v2(1.0 + dx, 1.0 - dy);
 
             if (self._gizmosView.pivot === 'center') {
                 for (i = 0; i < localscaleList.length; ++i) {
-                    self._nodes[i].scale = Fire.v2(
+                    self._nodes[i].scale = cc.v2(
                         localscaleList[i].x * scale.x,
                         localscaleList[i].y * scale.y
                     );
 
-                    var offset = Fire.v2(
+                    var offset = cc.v2(
                         offsetList[i].x * scale.x,
                         offsetList[i].y * scale.y
                     );
@@ -47,7 +47,7 @@ function ScaleGizmo ( gizmosView, nodes ) {
             }
             else {
                 for (i = 0; i < localscaleList.length; ++i) {
-                    self._nodes[i].scale = Fire.v2(
+                    self._nodes[i].scale = cc.v2(
                         localscaleList[i].x * scale.x,
                         localscaleList[i].y * scale.y
                     );

@@ -3,8 +3,8 @@ function MoveGizmo ( gizmosView, nodes ) {
         self = this
         ;
 
-    var mappingH = Fire.Runtime.Settings['mapping-h'];
-    var mappingV = Fire.Runtime.Settings['mapping-v'];
+    var mappingH = cc.Runtime.Settings['mapping-h'];
+    var mappingV = cc.Runtime.Settings['mapping-v'];
 
     this.xDirection = (mappingH[1] - mappingH[0]) > 0 ? 1 : -1;
     this.yDirection = (mappingV[1] - mappingV[0]) > 0 ? 1 : -1;
@@ -24,7 +24,7 @@ function MoveGizmo ( gizmosView, nodes ) {
             dx *= self.xDirection;
             dy *= self.yDirection;
 
-            var delta = new Fire.Vec2(dx / self._gizmosView.scale, dy / self._gizmosView.scale);
+            var delta = new cc.Vec2(dx / self._gizmosView.scale, dy / self._gizmosView.scale);
 
             for (var i = 0; i < scenePosList.length; ++i) {
                 self._nodes[i].scenePosition = scenePosList[i].add(delta);

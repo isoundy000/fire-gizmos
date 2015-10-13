@@ -86,8 +86,8 @@ GizmosUtils.getCenter = function ( nodes ) {
     var centerY = (minY + maxY) * 0.5;
 
 
-    var scene = Fire.engine.getCurrentScene();
-    var scenePos = scene.transformPointToLocal( Fire.v2(centerX,centerY) );
+    var scene = cc.engine.getCurrentScene();
+    var scenePos = scene.transformPointToLocal( cc.v2(centerX,centerY) );
     return scenePos;
 };
 
@@ -290,7 +290,7 @@ GizmosUtils.positionTool = function ( svg, callbacks ) {
     var group = svg.group();
     var xarrow, yarrow, moveRect;
 
-    group.position = Fire.v2(0,0);
+    group.position = cc.v2(0,0);
     group.rotation = 0.0;
 
     // x-arrow
@@ -417,7 +417,7 @@ GizmosUtils.rotationTool = function ( svg, callbacks ) {
     var dragging = false;
     var color = "#f00";
 
-    group.position = new Fire.Vec2(0,0);
+    group.position = new cc.Vec2(0,0);
     group.rotation = 0.0;
 
     // circle
@@ -501,8 +501,8 @@ GizmosUtils.rotationTool = function ( svg, callbacks ) {
         },
 
         update: function ( dx, dy ) {
-            var v1 = new Fire.Vec2( x1,    y1    );
-            var v2 = new Fire.Vec2( x1+dx, y1+dy );
+            var v1 = new cc.Vec2( x1,    y1    );
+            var v2 = new cc.Vec2( x1+dx, y1+dy );
 
             var magSqr1 = v1.magSqr();
             var magSqr2 = v2.magSqr();
@@ -555,7 +555,7 @@ GizmosUtils.scaleTool = function ( svg, callbacks ) {
     var group = svg.group();
     var xarrow, yarrow, scaleRect;
 
-    group.position = new Fire.Vec2(0,0);
+    group.position = new cc.Vec2(0,0);
     group.rotation = 0.0;
 
     // x-slider
