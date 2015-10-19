@@ -1,3 +1,5 @@
+'use strict';
+
 function ScaleGizmo ( gizmosView, nodes ) {
     var localscaleList = [], offsetList = [],
         self = this,
@@ -68,7 +70,7 @@ ScaleGizmo.prototype.update = function () {
     this._scaleTool.show();
 
     var activeTarget = this._nodes[0];
-    var worldpos, screenpos, rotation;
+    var scenePos, screenPos, rotation;
 
     if (this._gizmosView.pivot === 'center') {
         scenePos = Editor.GizmosUtils.getCenter(this._nodes);

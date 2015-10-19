@@ -1,3 +1,5 @@
+'use strict';
+
 function ParticleGizmo ( gizmosView, node ) {
     this.hovering = false;
     this.selecting = false;
@@ -19,7 +21,7 @@ ParticleGizmo.prototype.update = function () {
     var screenPos = this._gizmosView.sceneToPixel(this._node.scenePosition);
     screenPos.x = Editor.GizmosUtils.snapPixel(screenPos.x);
     screenPos.y = Editor.GizmosUtils.snapPixel(screenPos.y);
-    var rotation = this._node.sceneRotation;
+    // var rotation = this._node.sceneRotation;
 
     this._icon
         .scale(s,s)
