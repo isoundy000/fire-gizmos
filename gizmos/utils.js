@@ -852,23 +852,23 @@ GizmosUtils.positionLineTool = function ( svg, origin, pos, local, lineColor, te
     return group;
 };
 
-var RectToolType = cc.Enum({
-    None: -1,
+var RectToolType = {
+    None: 0,
 
-    LeftBottom: -1,
-    LeftTop: -1,
-    RightTop: -1,
-    RightBottom: -1,
+    LeftBottom: 1,
+    LeftTop: 2,
+    RightTop: 3,
+    RightBottom: 4,
 
-    Left: -1,
-    Right: -1,
-    Top: -1,
-    Bottom: -1,
+    Left: 5,
+    Right: 6,
+    Top: 7,
+    Bottom: 8,
 
-    Center: -1,
+    Center: 9,
 
-    Anchor: -1
-});
+    Anchor: 10
+};
 
 GizmosUtils.rectTool = function (svg, callbacks) {
     var group = svg.group();
