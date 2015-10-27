@@ -5,6 +5,7 @@
     Editor.gizmos.move = require('./gizmos/move-gizmo');
     Editor.gizmos.rotate = require('./gizmos/rotate-gizmo');
     Editor.gizmos.scale = require('./gizmos/scale-gizmo');
+    Editor.gizmos.rect = require('./gizmos/rect-gizmo');
 
     Editor.gizmos['cc.SpriteWrapper'] = require('./gizmos/sprite-gizmo');
     Editor.gizmos['cc.BitmapFontWrapper'] = require('./gizmos/sprite-gizmo');

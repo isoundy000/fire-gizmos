@@ -254,6 +254,7 @@ Editor.registerElement({
             case 'move': gizmoDef = Editor.gizmos.move; break;
             case 'rotate': gizmoDef = Editor.gizmos.rotate; break;
             case 'scale': gizmoDef = Editor.gizmos.scale; break;
+            case 'rect': gizmoDef = Editor.gizmos.rect; break;
         }
 
         if ( !gizmoDef ) {

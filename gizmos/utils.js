@@ -695,6 +695,352 @@ GizmosUtils.scaleTool = function ( svg, callbacks ) {
     return group;
 };
 
+GizmosUtils.circleTool = function ( svg, size, fill, stroke, callbacks ) {
+    var point = svg.circle( size )
+                    .fill(fill ? fill : 'none')
+                    .stroke(stroke ? stroke : 'none')
+                    ;
+    var dragging = false;
+
+    point.style( 'pointer-events', 'bounding-box' );
+
+    point.on( 'mousemove', function ( event ) {
+        event.stopPropagation();
+    } );
+    point.on( 'mouseover', function ( event ) {
+        if (fill) {
+            var lightColor = chroma(fill.color).brighter().hex();
+            point.fill( { color: lightColor } );
+        }
+
+        if (stroke) {
+            var lightColor = chroma(stroke.color).brighter().hex();
+            point.stroke( { color: lightColor } );
+        }
+
+    } );
+
+    point.on( 'mouseout', function ( event ) {
+        event.stopPropagation();
+
+        if ( !dragging ) {
+            if (fill) point.fill(fill);
+            if (stroke) point.stroke(stroke);
+        }
+    } );
+
+    _addMoveHandles( point, {
+        start: function () {
+            dragging = true;
+
+            if (fill) {
+                var superLightColor = chroma(fill.color).brighter().brighter().hex();
+                point.fill( { color: superLightColor } );
+            }
+
+            if (stroke) {
+                var superLightColor = chroma(stroke.color).brighter().brighter().hex();
+                point.stroke( { color: superLightColor } );
+            }
+
+            if ( callbacks.start )
+                callbacks.start ();
+        },
+
+        update: function ( dx, dy ) {
+            if ( callbacks.update )
+                callbacks.update ( dx, dy );
+        },
+
+        end: function () {
+            dragging = false;
+
+            if (fill) point.fill(fill);
+            if (stroke) point.stroke(stroke);
+
+            if ( callbacks.end )
+                callbacks.end ();
+        }
+    }  );
+
+    return point;
+};
+
+GizmosUtils.lineTool = function ( svg, from, to, color, callbacks ) {
+    var group = svg.group();
+    var line = group.line( from.x, from.y, to.x, to.y )
+                    .stroke({ width: 1, color: color })
+                    ;
+    // used for hit test
+    var bgline = group.line( from.x, from.y, to.x, to.y)
+                    .stroke({ width: 8, color: color })
+                    .style('stroke-opacity', 0)
+                    ;
+    var dragging = false;
+
+    group.on( 'mousemove', function ( event ) {
+        event.stopPropagation();
+    } );
+    group.on( 'mouseover', function ( event ) {
+        var lightColor = chroma(color).brighter().hex();
+        line.stroke( { color: lightColor } );
+    } );
+
+    group.on( 'mouseout', function ( event ) {
+        event.stopPropagation();
+
+        if ( !dragging ) {
+            line.stroke( { color: color } );
+        }
+    } );
+
+    _addMoveHandles( group, {
+        start: function () {
+            dragging = true;
+
+            var superLightColor = chroma(color).brighter().brighter().hex();
+            line.stroke( { color: superLightColor } );
+
+            if ( callbacks.start )
+                callbacks.start ();
+        },
+
+        update: function ( dx, dy ) {
+            if ( callbacks.update )
+                callbacks.update ( dx, dy );
+        },
+
+        end: function () {
+            dragging = false;
+            line.stroke( { color: color } );
+
+            if ( callbacks.end )
+                callbacks.end ();
+        }
+    } );
+
+    group.plot = function () {
+        line.plot.apply(line, arguments);
+        bgline.plot.apply(bgline, arguments);
+    };
+
+    return group;
+};
+
+GizmosUtils.positionLineTool = function ( svg, origin, pos, local, lineColor, textColor ) {
+    var group = svg.group();
+
+    var xLine = group.line( origin.x, pos.y, pos.x, pos.y )
+                    .stroke({ width: 1, color: lineColor });
+    var yLine = group.line( pos.x, origin.y, pos.x, pos.y )
+                    .stroke({ width: 1, color: lineColor });
+
+    var xText = group.text('' + local.x).fill(textColor);
+    var yText = group.text('' + local.y).fill(textColor);
+
+    group.style('stroke-dasharray', '5 5');
+    group.style('stroke-opacity', 0.8);
+
+    group.plot = function (origin, pos, local) {
+        xLine.plot.call(yLine, origin.x, pos.y, pos.x, pos.y);
+        yLine.plot.call(xLine, pos.x, origin.y, pos.x, pos.y);
+
+        xText.text('' + Math.floor(local.x)).move(origin.x + (pos.x - origin.x) / 2, pos.y);
+        yText.text('' + Math.floor(local.y)).move(pos.x, origin.y + (pos.y - origin.y) / 2);
+    };
+
+    return group;
+};
+
+var RectToolType = cc.Enum({
+    None: -1,
+
+    LeftBottom: -1,
+    LeftTop: -1,
+    RightTop: -1,
+    RightBottom: -1,
+
+    Left: -1,
+    Right: -1,
+    Top: -1,
+    Bottom: -1,
+
+    Center: -1,
+
+    Anchor: -1
+});
+
+GizmosUtils.rectTool = function (svg, callbacks) {
+    var group = svg.group();
+    var sizeGroup = group.group();
+    var lb, lt, rt, rb;     // size points
+    var l, t, r, b;         // size sides
+    var rect;               // center rect
+    var anchor;             // anchor
+    var positionLineTool;   // show dash line along x,y direction
+    var sizeTextGroup, widthText, heightText;   // show size info when resize
+    var smallDragCircle;    // show when rect is too small
+
+    group.position = cc.v2(0,0);
+    group.rotation = 0.0;
+
+    group.type = RectToolType.None;
+
+    function creatToolCallbacks (type) {
+        return {
+            start: function () {
+                group.type = type;
+
+                if ( callbacks.start )
+                    callbacks.start.call(group, type);
+            },
+            update: function ( dx, dy ) {
+                if ( callbacks.update ) {
+                    callbacks.update.call(group, type, dx, dy);
+                }
+            },
+            end: function () {
+                group.type = RectToolType.None;
+
+                if ( callbacks.end )
+                    callbacks.end.call(group, type);
+            }
+        };
+    }
+
+
+    // init center rect
+    rect = group.polygon('0,0,0,0,0,0')
+                .fill('none')
+                .stroke('none')
+                ;
+
+    rect.style( 'pointer-events', 'bounding-box' );
+
+    _addMoveHandles( rect, creatToolCallbacks(RectToolType.Center) );
+
+    // init small darg circle
+    var smallDragCircleSize = 20;
+
+    smallDragCircle = GizmosUtils.circleTool(
+        group,
+        smallDragCircleSize,
+        {color: '#eee', opacity: 0.3},
+        {color: '#eee', opacity: 0.5, width: 2},
+        creatToolCallbacks(RectToolType.Center)
+    );
+
+    // init points
+    var pointSize = 8;
+
+    function createPointTool(type) {
+        return GizmosUtils.circleTool( sizeGroup, pointSize, {color: '#0e6dde'}, null, creatToolCallbacks(type));
+    }
+
+    lb = createPointTool(RectToolType.LeftBottom).style('cursor', 'nwse-resize');
+    lt = createPointTool(RectToolType.LeftTop).style('cursor', 'nesw-resize');
+    rt = createPointTool(RectToolType.RightTop).style('cursor', 'nwse-resize');;
+    rb = createPointTool(RectToolType.RightBottom).style('cursor', 'nesw-resize');
+
+    // init sides
+    function createLineTool(type) {
+        return GizmosUtils.lineTool( sizeGroup, cc.v2(0,0), cc.v2(0,0), '#8c8c8c',  creatToolCallbacks(type));
+    }
+
+    l = createLineTool(RectToolType.Left).style('cursor', 'col-resize');
+    t = createLineTool(RectToolType.Top).style('cursor', 'row-resize');
+    r = createLineTool(RectToolType.Right).style('cursor', 'col-resize');
+    b = createLineTool(RectToolType.Bottom).style('cursor', 'row-resize');
+
+    // init position line tool
+    positionLineTool = GizmosUtils.positionLineTool(group, cc.v2(0,0), cc.v2(0,0), cc.v2(0,0), '#8c8c8c', '#eee');
+
+    // init anchor
+    var anchorSize = 10;
+    anchor = GizmosUtils.circleTool( group, anchorSize, null, {width: 3, color: '#0e6dde'}, creatToolCallbacks(RectToolType.Anchor))
+        .style('cursor', 'pointer');
+
+    //init size text
+    sizeTextGroup = group.group();
+    widthText = sizeTextGroup.text('0').fill('#eee');
+    heightText = sizeTextGroup.text('0').fill('#eee');
+
+    // set bounds
+    group.setBounds = function (bounds) {
+
+        if (Math.abs(bounds[2].x - bounds[0].x) < 10 &&
+            Math.abs(bounds[2].y - bounds[0].y) < 10) {
+
+            sizeGroup.hide();
+            anchor.hide();
+            smallDragCircle.show();
+
+            smallDragCircle.center(
+                bounds[0].x + (bounds[2].x - bounds[0].x)/2,
+                bounds[0].y + (bounds[2].y - bounds[0].y)/2
+            );
+        }
+        else {
+            sizeGroup.show();
+            smallDragCircle.hide();
+
+            rect.plot([
+                [bounds[0].x, bounds[0].y],
+                [bounds[1].x, bounds[1].y],
+                [bounds[2].x, bounds[2].y],
+                [bounds[3].x, bounds[3].y]
+            ]);
+
+            l.plot(bounds[0].x, bounds[0].y + pointSize/2, bounds[1].x, bounds[1].y - pointSize/2);
+            t.plot(bounds[1].x + pointSize/2, bounds[1].y, bounds[2].x - pointSize/2, bounds[2].y);
+            r.plot(bounds[2].x, bounds[2].y - pointSize/2, bounds[3].x, bounds[3].y + pointSize/2);
+            b.plot(bounds[3].x - pointSize/2, bounds[3].y, bounds[0].x + pointSize/2, bounds[0].y);
+
+            lb.center(bounds[0].x, bounds[0].y);
+            lt.center(bounds[1].x, bounds[1].y);
+            rt.center(bounds[2].x, bounds[2].y);
+            rb.center(bounds[3].x, bounds[3].y);
+
+            if (bounds.anchor) {
+                anchor.show();
+                anchor.center(bounds.anchor.x, bounds.anchor.y);
+            }
+            else {
+                anchor.hide();
+            }
+        }
+
+        if (bounds.origin &&
+            (group.type === RectToolType.Center ||
+             group.type === RectToolType.Anchor)) {
+            positionLineTool.show();
+            positionLineTool.plot(bounds.origin, bounds.anchor, bounds.localPosition);
+        }
+        else {
+            positionLineTool.hide();
+        }
+
+        if (bounds.localSize &&
+            group.type >= RectToolType.LeftBottom &&
+            group.type <= RectToolType.Bottom) {
+            sizeTextGroup.show();
+
+            widthText.text('' + Math.floor(bounds.localSize.x));
+            heightText.text('' + Math.floor(bounds.localSize.y));
+
+            widthText.center(bounds[0].x + (bounds[2].x - bounds[0].x)/2, bounds[2].y + 5);
+            heightText.center(bounds[0].x, bounds[0].y + (bounds[2].y - bounds[0].y)/2);
+        }
+        else {
+            sizeTextGroup.hide();
+        }
+    };
+
+    return group;
+};
+
+GizmosUtils.rectTool.Type = RectToolType;
+
 GizmosUtils.icon = function ( svg, url, w, h, hoverNode ) {
     var icon = svg.image(url)
                          .move( -w * 0.5, -h * 0.5 )
