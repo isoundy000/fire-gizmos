@@ -3,11 +3,11 @@ function MoveGizmo ( gizmosView, nodes ) {
         self = this
         ;
 
-    var mappingH = cc.Runtime.Settings['mapping-h'];
-    var mappingV = cc.Runtime.Settings['mapping-v'];
+    var mappingH = [1, 0, 1];
+    var mappingV = [0, 1, 1];
 
-    this.xDirection = (mappingH[1] - mappingH[0]) > 0 ? 1 : -1;
-    this.yDirection = (mappingV[1] - mappingV[0]) > 0 ? 1 : -1;
+    this.xDirection = mappingH[1] > mappingH[0] ? 1 : -1;
+    this.yDirection = mappingV[1] > mappingV[0] ? 1 : -1;
 
     this._gizmosView = gizmosView;
     this._nodes = nodes;
