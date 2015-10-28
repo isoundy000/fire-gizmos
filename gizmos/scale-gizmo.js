@@ -16,7 +16,8 @@ function ScaleGizmo ( gizmosView, nodes ) {
             localscaleList = [];
 
             for (i = 0; i < self._nodes.length; ++i) {
-                localscaleList.push(self._nodes[i].scale);
+                var node = self._nodes[i];
+                localscaleList.push(cc.v2(node.scaleX, node.scaleY));
             }
 
             if (self._gizmosView.pivot === 'center') {

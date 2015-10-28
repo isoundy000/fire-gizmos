@@ -6,12 +6,6 @@ function RectGizmo ( gizmosView, nodes ) {
         self = this
         ;
 
-    var mappingH = [1, 0, 1];
-    var mappingV = [0, 1, 1];
-
-    this.xDirection = (mappingH[1] - mappingH[0]) > 0 ? 1 : -1;
-    this.yDirection = (mappingV[1] - mappingV[0]) > 0 ? 1 : -1;
-
     this._gizmosView = gizmosView;
     this._nodes = nodes;
 
@@ -108,9 +102,6 @@ function RectGizmo ( gizmosView, nodes ) {
         },
 
         update: function (type, dx, dy) {
-            dx *= self.xDirection;
-            dy *= self.yDirection;
-
             var delta = new cc.Vec2(dx / self._gizmosView.scale, dy / self._gizmosView.scale);
 
             if (type === RectToolType.Anchor) {
