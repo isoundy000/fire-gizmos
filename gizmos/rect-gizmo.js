@@ -25,13 +25,13 @@ function RectGizmo ( gizmosView, nodes ) {
 
         node.scenePosition = scenePosList[0].sub(delta);
         node.anchorPoint = node.anchorPoint.add( cc.v2((node.x - originPos.x)/size.x, (node.y - originPos.y)/size.y) );
-    };
+    }
 
     function handleCenterRect (delta) {
         for (var i = 0; i < self._nodes.length; ++i) {
             self._nodes[i].scenePosition = scenePosList[i].add(delta);
         }
-    };
+    }
 
     function handleSizePoint (type, delta) {
         var sizeDelta = delta.clone();
@@ -94,7 +94,7 @@ function RectGizmo ( gizmosView, nodes ) {
             self._nodes[i].size = sizeList[0].add(cc.v2(sdx, sdy));
             self._nodes[i].scenePosition = scenePosList[i].add(d);
         }
-    };
+    }
 
     this._rectTool = Editor.GizmosUtils.rectTool( self._gizmosView.foreground, {
         start: function (type) {
