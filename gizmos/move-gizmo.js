@@ -3,8 +3,8 @@ function MoveGizmo ( gizmosView, nodes ) {
         self = this
         ;
 
-    var mappingH = [1, 0, 1];
-    var mappingV = [0, 1, 1];
+    var mappingH = [0,1,1];
+    var mappingV = [1,0,1];
 
     this.xDirection = mappingH[1] > mappingH[0] ? 1 : -1;
     this.yDirection = mappingV[1] > mappingV[0] ? 1 : -1;
