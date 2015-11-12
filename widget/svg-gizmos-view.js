@@ -241,7 +241,7 @@ Editor.registerElement({
         }
 
         if ( nodes.length === 1 ) {
-            node = nodes[0];
+            var node = nodes[0];
             if ( node.gizmo ) {
                 node.gizmo.selecting = false;
                 node.gizmo.editing = true;
