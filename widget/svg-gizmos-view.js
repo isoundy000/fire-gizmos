@@ -1,4 +1,8 @@
 (function () {
+'use strict';
+
+const SVG = require('svg.js');
+
 Editor.registerElement({
     properties: {
         scale: {
