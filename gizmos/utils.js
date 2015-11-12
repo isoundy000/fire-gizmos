@@ -1,3 +1,7 @@
+'use strict';
+
+const Chroma = require('chroma-js');
+
 var GizmosUtils = {};
 module.exports = GizmosUtils;
 
@@ -112,7 +116,7 @@ GizmosUtils.scaleSlider = function ( svg, size, color, callbacks ) {
         event.stopPropagation();
     } );
     group.on( 'mouseover', function ( event ) {
-        var lightColor = chroma(color).brighter().hex();
+        var lightColor = Chroma(color).brighter().hex();
         line.stroke( { color: lightColor } );
         rect.fill( { color: lightColor } );
 
@@ -173,7 +177,7 @@ GizmosUtils.freemoveTool = function ( svg, size, color, callbacks ) {
         event.stopPropagation();
     } );
     circle.on( 'mouseover', function ( event ) {
-        var lightColor = chroma(color).brighter().hex();
+        var lightColor = Chroma(color).brighter().hex();
         this.fill( { color: lightColor } )
             .stroke( { color: lightColor } )
             ;
@@ -238,7 +242,7 @@ GizmosUtils.arrowTool = function ( svg, size, color, callbacks ) {
         event.stopPropagation();
     } );
     group.on( 'mouseover', function ( event ) {
-        var lightColor = chroma(color).brighter().hex();
+        var lightColor = Chroma(color).brighter().hex();
         line.stroke( { color: lightColor } );
         arrow.fill( { color: lightColor } );
 
@@ -361,7 +365,7 @@ GizmosUtils.positionTool = function ( svg, callbacks ) {
         event.stopPropagation();
     } );
     moveRect.on( 'mouseover', function ( event ) {
-        var lightColor = chroma(color).brighter().hex();
+        var lightColor = Chroma(color).brighter().hex();
         this.fill( { color: lightColor } )
             .stroke( { color: lightColor } )
             ;
@@ -457,7 +461,7 @@ GizmosUtils.rotationTool = function ( svg, callbacks ) {
         event.stopPropagation();
     } );
     group.on( 'mouseover', function ( event ) {
-        var lightColor = chroma(color).brighter().hex();
+        var lightColor = Chroma(color).brighter().hex();
         circle.stroke( { color: lightColor } );
         line.stroke( { color: lightColor } );
         arrow.fill( { color: lightColor } );
@@ -632,7 +636,7 @@ GizmosUtils.scaleTool = function ( svg, callbacks ) {
         event.stopPropagation();
     } );
     scaleRect.on( 'mouseover', function ( event ) {
-        var lightColor = chroma(color).brighter().hex();
+        var lightColor = Chroma(color).brighter().hex();
         this.fill( { color: lightColor } )
             .stroke( { color: lightColor } )
             ;
@@ -709,12 +713,12 @@ GizmosUtils.circleTool = function ( svg, size, fill, stroke, callbacks ) {
     } );
     point.on( 'mouseover', function ( event ) {
         if (fill) {
-            var lightColor = chroma(fill.color).brighter().hex();
+            var lightColor = Chroma(fill.color).brighter().hex();
             point.fill( { color: lightColor } );
         }
 
         if (stroke) {
-            var lightColor = chroma(stroke.color).brighter().hex();
+            var lightColor = Chroma(stroke.color).brighter().hex();
             point.stroke( { color: lightColor } );
         }
 
@@ -734,12 +738,12 @@ GizmosUtils.circleTool = function ( svg, size, fill, stroke, callbacks ) {
             dragging = true;
 
             if (fill) {
-                var superLightColor = chroma(fill.color).brighter().brighter().hex();
+                var superLightColor = Chroma(fill.color).brighter().brighter().hex();
                 point.fill( { color: superLightColor } );
             }
 
             if (stroke) {
-                var superLightColor = chroma(stroke.color).brighter().brighter().hex();
+                var superLightColor = Chroma(stroke.color).brighter().brighter().hex();
                 point.stroke( { color: superLightColor } );
             }
 
@@ -782,7 +786,7 @@ GizmosUtils.lineTool = function ( svg, from, to, color, callbacks ) {
         event.stopPropagation();
     } );
     group.on( 'mouseover', function ( event ) {
-        var lightColor = chroma(color).brighter().hex();
+        var lightColor = Chroma(color).brighter().hex();
         line.stroke( { color: lightColor } );
     } );
 
@@ -798,7 +802,7 @@ GizmosUtils.lineTool = function ( svg, from, to, color, callbacks ) {
         start: function () {
             dragging = true;
 
-            var superLightColor = chroma(color).brighter().brighter().hex();
+            var superLightColor = Chroma(color).brighter().brighter().hex();
             line.stroke( { color: superLightColor } );
 
             if ( callbacks.start )
