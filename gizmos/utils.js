@@ -1029,8 +1029,8 @@ GizmosUtils.rectTool = function (svg, callbacks) {
             group.type <= RectToolType.Bottom) {
             sizeTextGroup.show();
 
-            widthText.text('' + Math.floor(bounds.localSize.x));
-            heightText.text('' + Math.floor(bounds.localSize.y));
+            widthText.text('' + Math.floor(bounds.localSize.width));
+            heightText.text('' + Math.floor(bounds.localSize.height));
 
             widthText.center(bounds[0].x + (bounds[2].x - bounds[0].x)/2, bounds[2].y + 5);
             heightText.center(bounds[0].x, bounds[0].y + (bounds[2].y - bounds[0].y)/2);

@@ -1,4 +1,5 @@
 var RectToolType = Editor.GizmosUtils.rectTool.Type;
+var v2 = cc.v2;
 
 function RectGizmo ( gizmosView, nodes ) {
     var scenePosList = [],
@@ -17,14 +18,17 @@ function RectGizmo ( gizmosView, nodes ) {
 
     function handleAnchorPoint (delta) {
         var node = self._nodes[0];
-        var size = node.size;
+        var size = node.getContentSize();
         var originPos = node.position;
 
-        delta.x *= size.x > 0 ? -1 : 1;
-        delta.y *= size.y > 0 ? -1 : 1;
+        delta.x *= size.width > 0 ? -1 : 1;
+        delta.y *= size.height > 0 ? -1 : 1;
 
         node.scenePosition = scenePosList[0].sub(delta);
-        node.anchorPoint = node.anchorPoint.add( cc.v2((node.x - originPos.x)/size.x, (node.y - originPos.y)/size.y) );
+
+        var anchor = v2(node.getAnchorPoint());
+        anchor = anchor.add( cc.v2((node.x - originPos.x)/size.width, (node.y - originPos.y)/size.height) );
+        node.setAnchorPoint(anchor);
     }
 
     function handleCenterRect (delta) {
@@ -65,33 +69,35 @@ function RectGizmo ( gizmosView, nodes ) {
             var node = self._nodes[i];
 
             //
-            var widthDirection = sizeList[i].x > 0 ? 1 : -1;
-            var heightDirection = sizeList[i].y > 0 ? 1 : -1;
+            var widthDirection = sizeList[i].width > 0 ? 1 : -1;
+            var heightDirection = sizeList[i].height > 0 ? 1 : -1;
 
             var sdx = sizeDelta.x * widthDirection;
             var sdy = sizeDelta.y * heightDirection;
 
             var d = delta.clone();
+            var anchor = v2(node.getAnchorPoint());
 
             if (type === RectToolType.Right ||
                 type === RectToolType.RightTop ||
                 type === RectToolType.RightBottom) {
-                d.x *= widthDirection === -1 ? (1 - node.anchorPoint.x) : node.anchorPoint.x;
+                d.x *= widthDirection === -1 ? (1 - anchor.x) : anchor.x;
             }
             else {
-                d.x *= widthDirection === -1 ? node.anchorPoint.x : (1 - node.anchorPoint.x);
+                d.x *= widthDirection === -1 ? anchor.x : (1 - anchor.x);
             }
 
             if (type === RectToolType.LeftBottom ||
                 type === RectToolType.Bottom ||
                 type === RectToolType.RightBottom) {
-                d.y *= heightDirection === -1 ? (1 - node.anchorPoint.y) : node.anchorPoint.y;
+                d.y *= heightDirection === -1 ? (1 - anchor.y) : anchor.y;
             }
             else {
-                d.y *= heightDirection === -1 ? node.anchorPoint.y : (1 - node.anchorPoint.y);
+                d.y *= heightDirection === -1 ? anchor.y : (1 - anchor.y);
             }
 
-            self._nodes[i].size = sizeList[0].add(cc.v2(sdx, sdy));
+            var size = sizeList[0];
+            self._nodes[i].setContentSize(cc.size(size.width + sdx, size.height + sdy));
             self._nodes[i].scenePosition = scenePosList[i].add(d);
         }
     }
@@ -102,8 +108,9 @@ function RectGizmo ( gizmosView, nodes ) {
             sizeList.length = 0;
 
             for (var i = 0; i < self._nodes.length; ++i) {
-                scenePosList.push(self._nodes[i].scenePosition);
-                sizeList.push(self._nodes[i].size);
+                var node = self._nodes[i];
+                scenePosList.push(node.scenePosition);
+                sizeList.push(node.getContentSize());
             }
         },
 
@@ -162,12 +169,12 @@ RectGizmo.prototype.update = function () {
     bounds = [cc.p(minX, minY), cc.p(minX, maxY), cc.p(maxX, maxY), cc.p(maxX, minY)];
     if (this._nodes.length === 1) {
         var node = this._nodes[0];
-        var anchor = node.anchorPoint;
+        var anchor = node.getAnchorPoint();
 
         bounds.anchor = cc.v2(minX + (maxX - minX) * anchor.x, maxY - (maxY - minY) * anchor.y);
         bounds.origin = this._gizmosView.worldToPixel(node.parent.worldPosition);
         bounds.localPosition = node.position;
-        bounds.localSize = node.size;
+        bounds.localSize = node.getContentSize();
     }
 
     this._rectTool.setBounds(bounds);
