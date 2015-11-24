@@ -1,5 +1,6 @@
 var RectToolType = Editor.GizmosUtils.rectTool.Type;
 var v2 = cc.v2;
+var snapPixel = Editor.GizmosUtils.snapPixel;
 
 function RectGizmo ( gizmosView, nodes ) {
     var scenePosList = [],
@@ -166,7 +167,13 @@ RectGizmo.prototype.update = function () {
         calcBounds(this._gizmosView.worldToPixel(bounds[3]));
     }.bind(this));
 
+    minX = snapPixel(minX);
+    minY = snapPixel(minY);
+    maxX = snapPixel(maxX);
+    maxY = snapPixel(maxY);
+
     bounds = [cc.p(minX, minY), cc.p(minX, maxY), cc.p(maxX, maxY), cc.p(maxX, minY)];
+
     if (this._nodes.length === 1) {
         var node = this._nodes[0];
         var anchor = node.getAnchorPoint();
@@ -175,6 +182,15 @@ RectGizmo.prototype.update = function () {
         bounds.origin = this._gizmosView.worldToPixel(node.parent.worldPosition);
         bounds.localPosition = node.position;
         bounds.localSize = node.getContentSize();
+
+        function snapPixelWihVec2 (vec2) {
+            vec2.x = snapPixel(vec2.x);
+            vec2.y = snapPixel(vec2.y);
+        }
+
+        snapPixelWihVec2(bounds.anchor);
+        snapPixelWihVec2(bounds.origin);
+        snapPixelWihVec2(bounds.localPosition);
     }
 
     this._rectTool.setBounds(bounds);
