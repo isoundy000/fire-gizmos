@@ -7,7 +7,5 @@
     Editor.gizmos.scale = require('./gizmos/scale-gizmo');
     Editor.gizmos.rect = require('./gizmos/rect-gizmo');
 
-    Editor.gizmos['cc.SpriteWrapper'] = require('./gizmos/sprite-gizmo');
-    Editor.gizmos['cc.BitmapFontWrapper'] = require('./gizmos/sprite-gizmo');
-    Editor.gizmos['cc.ParticleWrapper'] = require('./gizmos/particle-gizmo');
+    Editor.gizmos['cc.Node'] = require('./gizmos/node-gizmo');
 })();
