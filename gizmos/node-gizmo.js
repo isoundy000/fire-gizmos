@@ -23,10 +23,6 @@ NodeGizmo.prototype.hideSelectTool = function () {
 NodeGizmo.prototype.update = function () {
     var bounds, v1, v2, v3, v4;
 
-    if ( !this.textureUuid ) {
-        // TODO:
-    }
-
     if ( this.selecting || this.editing ) {
         this.ensureSelectTool();
 
