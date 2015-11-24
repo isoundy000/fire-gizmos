@@ -1,4 +1,4 @@
-function SpriteGizmo ( gizmosView, node ) {
+function NodeGizmo ( gizmosView, node ) {
     this.hovering = false;
     this.selecting = false;
     this.editing = false;
@@ -8,24 +8,20 @@ function SpriteGizmo ( gizmosView, node ) {
     this._selectTool = null;
 }
 
-SpriteGizmo.prototype.ensureSelectTool = function () {
+NodeGizmo.prototype.ensureSelectTool = function () {
     if ( !this._selectTool ) {
         this._selectTool = this._gizmosView.scene.polygon();
     }
 };
 
-SpriteGizmo.prototype.hideSelectTool = function () {
+NodeGizmo.prototype.hideSelectTool = function () {
     if ( this._selectTool ) {
         this._selectTool.hide();
     }
 };
 
-SpriteGizmo.prototype.update = function () {
+NodeGizmo.prototype.update = function () {
     var bounds, v1, v2, v3, v4;
-
-    if ( !this.textureUuid ) {
-        // TODO:
-    }
 
     if ( this.selecting || this.editing ) {
         this.ensureSelectTool();
@@ -77,10 +73,10 @@ SpriteGizmo.prototype.update = function () {
     }
 };
 
-SpriteGizmo.prototype.remove = function () {
+NodeGizmo.prototype.remove = function () {
     if ( this._selectTool ) {
         this._selectTool.remove();
     }
 };
 
-module.exports = SpriteGizmo;
+module.exports = NodeGizmo;
