@@ -125,7 +125,7 @@ Editor.registerElement({
         this._designRect
             .move( x, y )
             .size( w, h )
-            .fill( { opacity: 0.0 } )
+            .fill('none')
             .stroke( { width: 1, color: '#f0f', opacity: 0.8 } )
             ;
     },
