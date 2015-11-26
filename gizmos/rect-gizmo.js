@@ -121,6 +121,10 @@ function RectGizmo ( gizmosView, nodes ) {
 
             var delta = new cc.Vec2(dx / self._gizmosView.scale, dy / self._gizmosView.scale);
 
+            self._nodes.forEach( node => {
+                self._gizmosView.undo.recordObject( node.uuid );
+            });
+
             if (type === RectToolType.Anchor) {
                 handleAnchorPoint(delta.clone());
             }
@@ -132,7 +136,11 @@ function RectGizmo ( gizmosView, nodes ) {
             }
 
             self._gizmosView.repaintHost();
-        }
+        },
+
+        end: function () {
+            self._gizmosView.undo.commit();
+        },
     });
 }
 

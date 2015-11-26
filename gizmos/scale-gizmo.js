@@ -30,6 +30,10 @@ function ScaleGizmo ( gizmosView, nodes ) {
         },
 
         update: function (dx, dy) {
+            self._nodes.forEach( node => {
+                self._gizmosView.undo.recordObject( node.uuid );
+            });
+
             var i, scale;
 
             scale = cc.v2(1.0 + dx, 1.0 - dy);
@@ -58,7 +62,11 @@ function ScaleGizmo ( gizmosView, nodes ) {
             }
 
             self._gizmosView.repaintHost();
-        }
+        },
+
+        end: function () {
+            self._gizmosView.undo.commit();
+        },
     });
 }
 
