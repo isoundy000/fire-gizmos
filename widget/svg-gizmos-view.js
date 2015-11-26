@@ -36,9 +36,6 @@ Editor.registerElement({
         },
     },
 
-    created: function () {
-    },
-
     ready: function () {
         this._selection = [];
 
