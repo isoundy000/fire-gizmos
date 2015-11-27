@@ -82,14 +82,16 @@ function RotateGizmo ( gizmosView, nodes ) {
 }
 
 RotateGizmo.prototype.update = function () {
-    if ( this._nodes.length === 0 ) {
+    var activeTarget = this._nodes[0];
+    var isTargetValid = activeTarget && activeTarget.isValid;
+
+    if (!isTargetValid) {
         this._rotationTool.hide();
         return;
     }
 
     this._rotationTool.show();
 
-    var activeTarget = this._nodes[0];
     var scenePos, screenPos, rotation;
 
     if (this._gizmosView.pivot === 'center') {

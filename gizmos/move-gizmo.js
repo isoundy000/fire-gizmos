@@ -44,14 +44,16 @@ function MoveGizmo ( gizmosView, nodes ) {
 }
 
 MoveGizmo.prototype.update = function () {
-    if ( this._nodes.length === 0 ) {
+    var activeTarget = this._nodes[0];
+    var isTargetValid = activeTarget && activeTarget.isValid;
+
+    if (!isTargetValid) {
         this._positionTool.hide();
         return;
     }
 
     this._positionTool.show();
 
-    var activeTarget = this._nodes[0];
     var scenePos, screenPos, rotation;
 
     if (this._gizmosView.pivot === 'center') {
