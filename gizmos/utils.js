@@ -1037,8 +1037,8 @@ GizmosUtils.rectTool = function (svg, callbacks) {
             widthText.text('' + Math.floor(bounds.localSize.width));
             heightText.text('' + Math.floor(bounds.localSize.height));
 
-            widthText.center(bounds[0].x + (bounds[2].x - bounds[0].x)/2, bounds[2].y + 5);
-            heightText.center(bounds[0].x, bounds[0].y + (bounds[2].y - bounds[0].y)/2);
+            widthText.center(bounds[1].x + (bounds[2].x - bounds[1].x)/2, bounds[1].y + (bounds[2].y - bounds[1].y)/2 + 5);
+            heightText.center(bounds[2].x + (bounds[3].x - bounds[2].x)/2 + 15, bounds[2].y + (bounds[3].y - bounds[2].y)/2);
         }
         else {
             sizeTextGroup.hide();
