@@ -46,14 +46,18 @@ function RectGizmo ( gizmosView, nodes ) {
         var size = node.getContentSize();
         var originPos = node.position;
 
-        delta.x *= size.width > 0 ? -1 : 1;
-        delta.y *= size.height > 0 ? -1 : 1;
-
-        var pos = worldPosList[0].sub(delta);
+        var pos = worldPosList[0].add(delta);
         node.worldPosition = pos;
 
+        var parent2nodeTransform  = node.getParentToNodeTransform();
+        parent2nodeTransform.tx   = parent2nodeTransform.ty = 0;
+
+        // compute position
+        var d = node.position.sub(originPos);
+        d = cc.pointApplyAffineTransform(d, parent2nodeTransform);
+
         var anchor = v2(node.getAnchorPoint());
-        anchor = anchor.add( cc.v2((node.x - originPos.x)/size.width, (node.y - originPos.y)/size.height) );
+        anchor = anchor.add( cc.v2((d.x)/size.width, (d.y)/size.height) );
         node.setAnchorPoint(anchor);
     }
 
