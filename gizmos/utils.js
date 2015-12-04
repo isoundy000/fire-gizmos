@@ -5,8 +5,13 @@ const Chroma = require('chroma-js');
 var GizmosUtils = {};
 module.exports = GizmosUtils;
 
-function _addMoveHandles ( gizmo, callbacks ) {
+function _addMoveHandles ( gizmo, cursor, callbacks ) {
     var pressx, pressy;
+
+    if (typeof cursor !== 'string') {
+        callbacks = cursor;
+        cursor = 'default';
+    }
 
     //
     var mousemoveHandle = function(event) {
@@ -37,7 +42,7 @@ function _addMoveHandles ( gizmo, callbacks ) {
             pressx = event.clientX;
             pressy = event.clientY;
 
-            EditorUI.addDragGhost("default");
+            EditorUI.addDragGhost(cursor);
             document.addEventListener ( 'mousemove', mousemoveHandle );
             document.addEventListener ( 'mouseup', mouseupHandle );
 
@@ -699,7 +704,7 @@ GizmosUtils.scaleTool = function ( svg, callbacks ) {
     return group;
 };
 
-GizmosUtils.circleTool = function ( svg, size, fill, stroke, callbacks ) {
+GizmosUtils.circleTool = function ( svg, size, fill, stroke, cursor, callbacks ) {
     var point = svg.circle( size )
                     .fill(fill ? fill : 'none')
                     .stroke(stroke ? stroke : 'none')
@@ -733,7 +738,7 @@ GizmosUtils.circleTool = function ( svg, size, fill, stroke, callbacks ) {
         }
     } );
 
-    _addMoveHandles( point, {
+    _addMoveHandles( point, cursor, {
         start: function () {
             dragging = true;
 
@@ -770,7 +775,7 @@ GizmosUtils.circleTool = function ( svg, size, fill, stroke, callbacks ) {
     return point;
 };
 
-GizmosUtils.lineTool = function ( svg, from, to, color, callbacks ) {
+GizmosUtils.lineTool = function ( svg, from, to, color, cursor, callbacks ) {
     var group = svg.group();
     var line = group.line( from.x, from.y, to.x, to.y )
                     .stroke({ width: 1, color: color })
@@ -798,7 +803,7 @@ GizmosUtils.lineTool = function ( svg, from, to, color, callbacks ) {
         }
     } );
 
-    _addMoveHandles( group, {
+    _addMoveHandles( group, cursor, {
         start: function () {
             dragging = true;
 
@@ -919,7 +924,7 @@ GizmosUtils.rectTool = function (svg, callbacks) {
                 .stroke('none')
                 ;
 
-    rect.style( 'pointer-events', 'bounding-box' );
+    rect.style( 'pointer-events', 'fill' );
 
     _addMoveHandles( rect, creatToolCallbacks(RectToolType.Center) );
 
@@ -934,27 +939,27 @@ GizmosUtils.rectTool = function (svg, callbacks) {
         creatToolCallbacks(RectToolType.Center)
     );
 
+    // init sides
+    function createLineTool(type, cursor) {
+        return GizmosUtils.lineTool( sizeGroup, cc.v2(0,0), cc.v2(0,0), '#8c8c8c', cursor, creatToolCallbacks(type)).style('cursor', cursor);
+    }
+
+    l = createLineTool(RectToolType.Left, 'col-resize');
+    t = createLineTool(RectToolType.Top, 'row-resize');
+    r = createLineTool(RectToolType.Right, 'col-resize');
+    b = createLineTool(RectToolType.Bottom, 'row-resize');
+
     // init points
     var pointSize = 8;
 
-    function createPointTool(type) {
-        return GizmosUtils.circleTool( sizeGroup, pointSize, {color: '#0e6dde'}, null, creatToolCallbacks(type));
+    function createPointTool(type, cursor) {
+        return GizmosUtils.circleTool( sizeGroup, pointSize, {color: '#0e6dde'}, null, cursor, creatToolCallbacks(type)).style('cursor', cursor);
     }
 
-    lb = createPointTool(RectToolType.LeftBottom).style('cursor', 'nwse-resize');
-    lt = createPointTool(RectToolType.LeftTop).style('cursor', 'nesw-resize');
-    rt = createPointTool(RectToolType.RightTop).style('cursor', 'nwse-resize');;
-    rb = createPointTool(RectToolType.RightBottom).style('cursor', 'nesw-resize');
-
-    // init sides
-    function createLineTool(type) {
-        return GizmosUtils.lineTool( sizeGroup, cc.v2(0,0), cc.v2(0,0), '#8c8c8c',  creatToolCallbacks(type));
-    }
-
-    l = createLineTool(RectToolType.Left).style('cursor', 'col-resize');
-    t = createLineTool(RectToolType.Top).style('cursor', 'row-resize');
-    r = createLineTool(RectToolType.Right).style('cursor', 'col-resize');
-    b = createLineTool(RectToolType.Bottom).style('cursor', 'row-resize');
+    lb = createPointTool(RectToolType.LeftBottom, 'nwse-resize');
+    lt = createPointTool(RectToolType.LeftTop, 'nesw-resize');
+    rt = createPointTool(RectToolType.RightTop, 'nwse-resize');
+    rb = createPointTool(RectToolType.RightBottom, 'nesw-resize');
 
     // init position line tool
     positionLineTool = GizmosUtils.positionLineTool(group, cc.v2(0,0), cc.v2(0,0), cc.v2(0,0), '#8c8c8c', '#eee');
@@ -995,10 +1000,10 @@ GizmosUtils.rectTool = function (svg, callbacks) {
                 [bounds[3].x, bounds[3].y]
             ]);
 
-            l.plot(bounds[0].x, bounds[0].y + pointSize/2, bounds[1].x, bounds[1].y - pointSize/2);
-            t.plot(bounds[1].x + pointSize/2, bounds[1].y, bounds[2].x - pointSize/2, bounds[2].y);
-            r.plot(bounds[2].x, bounds[2].y - pointSize/2, bounds[3].x, bounds[3].y + pointSize/2);
-            b.plot(bounds[3].x - pointSize/2, bounds[3].y, bounds[0].x + pointSize/2, bounds[0].y);
+            l.plot(bounds[0].x, bounds[0].y, bounds[1].x, bounds[1].y);
+            t.plot(bounds[1].x, bounds[1].y, bounds[2].x, bounds[2].y);
+            r.plot(bounds[2].x, bounds[2].y, bounds[3].x, bounds[3].y);
+            b.plot(bounds[3].x, bounds[3].y, bounds[0].x, bounds[0].y);
 
             lb.center(bounds[0].x, bounds[0].y);
             lt.center(bounds[1].x, bounds[1].y);
@@ -1032,8 +1037,8 @@ GizmosUtils.rectTool = function (svg, callbacks) {
             widthText.text('' + Math.floor(bounds.localSize.width));
             heightText.text('' + Math.floor(bounds.localSize.height));
 
-            widthText.center(bounds[0].x + (bounds[2].x - bounds[0].x)/2, bounds[2].y + 5);
-            heightText.center(bounds[0].x, bounds[0].y + (bounds[2].y - bounds[0].y)/2);
+            widthText.center(bounds[1].x + (bounds[2].x - bounds[1].x)/2, bounds[1].y + (bounds[2].y - bounds[1].y)/2 + 5);
+            heightText.center(bounds[2].x + (bounds[3].x - bounds[2].x)/2 + 15, bounds[2].y + (bounds[3].y - bounds[2].y)/2);
         }
         else {
             sizeTextGroup.hide();

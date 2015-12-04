@@ -1,10 +1,30 @@
+'use strict';
+
 var RectToolType = Editor.GizmosUtils.rectTool.Type;
 var v2 = cc.v2;
 var snapPixel = Editor.GizmosUtils.snapPixel;
 
+function snapPixelWihVec2 (vec2) {
+    vec2.x = snapPixel(vec2.x);
+    vec2.y = snapPixel(vec2.y);
+    return vec2;
+}
+
+function boundsToRect (bounds) {
+    return cc.rect(
+        bounds[1].x,
+        bounds[1].y,
+        bounds[3].x - bounds[1].x,
+        bounds[3].y - bounds[1].y
+    );
+}
+
+
 function RectGizmo ( gizmosView, nodes ) {
-    var scenePosList = [],
+    var worldPosList = [],
+        localPosList = [],
         sizeList = [],
+        rectList = [],
         self = this
         ;
 
@@ -17,30 +37,38 @@ function RectGizmo ( gizmosView, nodes ) {
     this._gizmosView = gizmosView;
     this._nodes = nodes;
 
+    this._processing = false;
+
+    this._rect = cc.rect(0, 0, 0, 0);
+
     function handleAnchorPoint (delta) {
         var node = self._nodes[0];
         var size = node.getContentSize();
         var originPos = node.position;
 
-        delta.x *= size.width > 0 ? -1 : 1;
-        delta.y *= size.height > 0 ? -1 : 1;
+        var pos = worldPosList[0].add(delta);
+        node.worldPosition = pos;
 
-        node.scenePosition = scenePosList[0].sub(delta);
+        var parent2nodeTransform  = node.getParentToNodeTransform();
+        parent2nodeTransform.tx   = parent2nodeTransform.ty = 0;
+
+        // compute position
+        var d = node.position.sub(originPos);
+        d = cc.pointApplyAffineTransform(d, parent2nodeTransform);
 
         var anchor = v2(node.getAnchorPoint());
-        anchor = anchor.add( cc.v2((node.x - originPos.x)/size.width, (node.y - originPos.y)/size.height) );
+        anchor = anchor.add( cc.v2((d.x)/size.width, (d.y)/size.height) );
         node.setAnchorPoint(anchor);
     }
 
     function handleCenterRect (delta) {
-        for (var i = 0; i < self._nodes.length; ++i) {
-            self._nodes[i].scenePosition = scenePosList[i].add(delta);
+        var length = self._nodes.length;
+        for (var i = 0; i < length; ++i) {
+            self._nodes[i].worldPosition = worldPosList[i].add(delta);
         }
     }
 
-    function handleSizePoint (type, delta) {
-        var sizeDelta = delta.clone();
-
+    function formatDelta (type, delta, sizeDelta) {
         if (type === RectToolType.LeftBottom) {
             sizeDelta.x *= -1;
         }
@@ -65,53 +93,132 @@ function RectGizmo ( gizmosView, nodes ) {
         else if (type === RectToolType.Bottom) {
             delta.x = sizeDelta.x = 0;
         }
+    }
 
-        for (var i = 0; i < self._nodes.length; ++i) {
+    function formatDeltaWithAnchor(type, anchor, delta) {
+        if (type === RectToolType.Right ||
+            type === RectToolType.RightTop ||
+            type === RectToolType.RightBottom) {
+            delta.x *= anchor.x;
+        }
+        else {
+            delta.x *= (1 - anchor.x);
+        }
+
+        if (type === RectToolType.LeftBottom ||
+            type === RectToolType.Bottom ||
+            type === RectToolType.RightBottom) {
+            delta.y *= anchor.y;
+        }
+        else {
+            delta.y *= (1 - anchor.y);
+        }
+
+        return delta;
+    }
+
+    function handleSizePoint (type, delta) {
+        var sizeDelta = delta.clone();
+        var size = sizeList[0];
+        var localPosition = localPosList[0];
+        var node = self._nodes[0];
+
+        // compute transform
+        var world2nodeTransform  = node.getWorldToNodeTransform();
+        var node2parentTransform = node.getNodeToParentTransform();
+
+        world2nodeTransform.tx   = world2nodeTransform.ty = 0;
+        node2parentTransform.tx  = node2parentTransform.ty = 0;
+
+        // compute position
+        var d = cc.pointApplyAffineTransform(delta, world2nodeTransform);
+        var anchor = node.getAnchorPoint();
+
+        formatDeltaWithAnchor(type, anchor, d);
+
+        // compute size
+        var sd = cc.pointApplyAffineTransform(sizeDelta, world2nodeTransform);
+
+        formatDelta(type, d, sd);
+
+        d = cc.pointApplyAffineTransform(d, node2parentTransform);
+
+        // apply results
+        node.position = localPosition.add(d);
+        node.setContentSize(cc.size(size.width + sd.x, size.height + sd.y));
+    }
+
+    function handleMutiSizePoint (type, delta) {
+        var sizeDelta = delta.clone();
+
+        formatDelta(type, delta, sizeDelta);
+
+        var d = delta.clone();
+        var anchor = v2(0,0);
+
+        formatDeltaWithAnchor(type, anchor, d);
+
+        var originRect = rectList.tempRect;
+
+        var rect = originRect.clone;
+        rect.x = originRect.x + d.x;
+        rect.y = originRect.y + d.y;
+        rect.width = originRect.width + sizeDelta.x;
+        rect.height = originRect.height + sizeDelta.y;
+
+        self._rect = rect;
+
+        for (var i = 0, l = self._nodes.length; i < l; i++) {
             var node = self._nodes[i];
+            var worldPosition = worldPosList[i];
 
-            //
-            var widthDirection = sizeList[i].width > 0 ? 1 : -1;
-            var heightDirection = sizeList[i].height > 0 ? 1 : -1;
+            var xp = (worldPosition.x - originRect.x) / originRect.width;
+            var yp = (worldPosition.y - originRect.y) / originRect.height;
 
-            var sdx = sizeDelta.x * widthDirection;
-            var sdy = sizeDelta.y * heightDirection;
+            node.worldPosition = v2(rect.x + xp * rect.width, rect.y + yp * rect.height);
 
-            var d = delta.clone();
-            var anchor = v2(node.getAnchorPoint());
+            var r = rectList[i];
+            var wp = r.width / originRect.width;
+            var hp = r.height / originRect.height;
 
-            if (type === RectToolType.Right ||
-                type === RectToolType.RightTop ||
-                type === RectToolType.RightBottom) {
-                d.x *= widthDirection === -1 ? (1 - anchor.x) : anchor.x;
-            }
-            else {
-                d.x *= widthDirection === -1 ? anchor.x : (1 - anchor.x);
-            }
+            var size = sizeList[i];
+            var widthDirection = size.width > 0 ? 1 : -1;
+            var heightDirection = size.height > 0 ? 1 : -1;
 
-            if (type === RectToolType.LeftBottom ||
-                type === RectToolType.Bottom ||
-                type === RectToolType.RightBottom) {
-                d.y *= heightDirection === -1 ? (1 - anchor.y) : anchor.y;
-            }
-            else {
-                d.y *= heightDirection === -1 ? anchor.y : (1 - anchor.y);
-            }
+            var sd = sizeDelta.clone();
+            sd.x = sd.x * wp * widthDirection;
+            sd.y = sd.y * hp * heightDirection;
 
-            var size = sizeList[0];
-            self._nodes[i].setContentSize(cc.size(size.width + sdx, size.height + sdy));
-            self._nodes[i].scenePosition = scenePosList[i].add(d);
+            // make transform
+            var world2nodeTransform = node.getWorldToNodeTransform();
+            world2nodeTransform.tx = world2nodeTransform.ty = 0;
+            world2nodeTransform.a = Math.abs(world2nodeTransform.a);
+            world2nodeTransform.b = Math.abs(world2nodeTransform.b);
+            world2nodeTransform.c = Math.abs(world2nodeTransform.c);
+            world2nodeTransform.d = Math.abs(world2nodeTransform.d);
+
+            sd = cc.pointApplyAffineTransform(sd, world2nodeTransform);
+            node.setContentSize(cc.size(size.width + sd.x, size.height + sd.y));
         }
     }
 
     this._rectTool = Editor.GizmosUtils.rectTool( self._gizmosView.foreground, {
-        start: function (type) {
-            scenePosList.length = 0;
+        start: function () {
+            worldPosList.length = 0;
             sizeList.length = 0;
+            localPosList.length = 0;
+            rectList.length = 0;
 
-            for (var i = 0; i < self._nodes.length; ++i) {
+            rectList.tempRect = boundsToRect(self.getBounds());
+
+            self._processing = true;
+
+            for (var i = 0, l = self._nodes.length; i < l; ++i) {
                 var node = self._nodes[i];
-                scenePosList.push(node.scenePosition);
+                worldPosList.push(node.worldPosition);
+                localPosList.push(node.position);
                 sizeList.push(node.getContentSize());
+                rectList.push(node.getWorldBounds());
             }
         },
 
@@ -119,7 +226,7 @@ function RectGizmo ( gizmosView, nodes ) {
             dx *= self.xDirection;
             dy *= self.yDirection;
 
-            var delta = new cc.Vec2(dx / self._gizmosView.scale, dy / self._gizmosView.scale);
+            var delta = new cc.Vec2(dx, dy);
 
             self._nodes.forEach( node => {
                 self._gizmosView.undo.recordObject( node.uuid );
@@ -132,30 +239,35 @@ function RectGizmo ( gizmosView, nodes ) {
                 handleCenterRect(delta.clone());
             }
             else {
-                handleSizePoint(type, delta.clone());
+                if (self._nodes.length > 1) {
+                    handleMutiSizePoint(type, delta.clone());
+                }
+                else {
+                    handleSizePoint(type, delta.clone());
+                }
             }
 
             self._gizmosView.repaintHost();
         },
 
         end: function () {
+            self._processing = false;
             self._gizmosView.undo.commit();
         },
     });
 }
 
+RectGizmo.prototype.formatBounds = function (bounds) {
+    var gizmosView = this._gizmosView;
+    return [
+        snapPixelWihVec2( gizmosView.worldToPixel(bounds[0]) ),
+        snapPixelWihVec2( gizmosView.worldToPixel(bounds[1]) ),
+        snapPixelWihVec2( gizmosView.worldToPixel(bounds[2]) ),
+        snapPixelWihVec2( gizmosView.worldToPixel(bounds[3]) )
+    ];
+};
 
-RectGizmo.prototype.update = function () {
-    var activeTarget = this._nodes[0];
-    var isTargetValid = activeTarget && activeTarget.isValid;
-
-    if (!isTargetValid) {
-        this._rectTool.hide();
-        return;
-    }
-
-    this._rectTool.show();
-
+RectGizmo.prototype.getBounds = function (flipX, flipY) {
     var minX = Number.MAX_VALUE,
         maxX = -Number.MAX_VALUE,
         minY = Number.MAX_VALUE,
@@ -170,38 +282,66 @@ RectGizmo.prototype.update = function () {
     }
 
     this._nodes.forEach(function (node) {
-        var bounds = node.getWorldOrientedBounds();
+        var bs = node.getWorldOrientedBounds();
 
-        calcBounds(this._gizmosView.worldToPixel(bounds[0]));
-        calcBounds(this._gizmosView.worldToPixel(bounds[1]));
-        calcBounds(this._gizmosView.worldToPixel(bounds[2]));
-        calcBounds(this._gizmosView.worldToPixel(bounds[3]));
+        calcBounds(bs[0]);
+        calcBounds(bs[1]);
+        calcBounds(bs[2]);
+        calcBounds(bs[3]);
     }.bind(this));
 
-    minX = snapPixel(minX);
-    minY = snapPixel(minY);
-    maxX = snapPixel(maxX);
-    maxY = snapPixel(maxY);
+    if (flipX) {
+        var temp = minX;
+        minX = maxX;
+        maxX = temp;
+    }
 
-    bounds = [cc.p(minX, minY), cc.p(minX, maxY), cc.p(maxX, maxY), cc.p(maxX, minY)];
+    if (flipY) {
+        var temp = minY;
+        minY = maxY;
+        maxY = temp;
+    }
 
-    if (this._nodes.length === 1) {
+    // bl, tl, tr, br
+    return [cc.p(minX, maxY), cc.p(minX, minY), cc.p(maxX, minY), cc.p(maxX, maxY)];
+}
+
+RectGizmo.prototype.update = function () {
+    var activeTarget = this._nodes[0];
+    var isTargetValid = activeTarget && activeTarget.isValid;
+
+    if (!isTargetValid) {
+        this._rectTool.hide();
+        return;
+    }
+
+    this._rectTool.show();
+
+    var length = this._nodes.length;
+    var bounds = [];
+    var gizmosView = this._gizmosView;
+
+    if (length === 1) {
         var node = this._nodes[0];
-        var anchor = node.getAnchorPoint();
+        bounds = node.getWorldOrientedBounds();
+        bounds = this.formatBounds(bounds);
 
-        bounds.anchor = cc.v2(minX + (maxX - minX) * anchor.x, maxY - (maxY - minY) * anchor.y);
-        bounds.origin = this._gizmosView.worldToPixel(node.parent.worldPosition);
-        bounds.localPosition = node.position;
+        bounds.anchor = snapPixelWihVec2( gizmosView.worldToPixel( node.worldPosition ) );
+        bounds.origin = snapPixelWihVec2( gizmosView.worldToPixel( node.parent.worldPosition ) );
+        bounds.localPosition = snapPixelWihVec2( node.position );
         bounds.localSize = node.getContentSize();
+    }
+    else {
+        var flipX = false;
+        var flipY = false;
 
-        function snapPixelWihVec2 (vec2) {
-            vec2.x = snapPixel(vec2.x);
-            vec2.y = snapPixel(vec2.y);
+        if (this._processing) {
+            flipX = this._rect.width < 0;
+            flipY = this._rect.height < 0;
         }
 
-        snapPixelWihVec2(bounds.anchor);
-        snapPixelWihVec2(bounds.origin);
-        snapPixelWihVec2(bounds.localPosition);
+        bounds = this.getBounds(flipX, flipY);
+        bounds = this.formatBounds(bounds);
     }
 
     this._rectTool.setBounds(bounds);
