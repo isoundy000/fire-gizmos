@@ -3,12 +3,8 @@
 var RectToolType = Editor.GizmosUtils.rectTool.Type;
 var v2 = cc.v2;
 var snapPixel = Editor.GizmosUtils.snapPixel;
+var snapPixelWihVec2 = Editor.GizmosUtils.snapPixelWihVec2;
 
-function snapPixelWihVec2 (vec2) {
-    vec2.x = snapPixel(vec2.x);
-    vec2.y = snapPixel(vec2.y);
-    return vec2;
-}
 
 function boundsToRect (bounds) {
     return cc.rect(
@@ -304,7 +300,7 @@ RectGizmo.prototype.getBounds = function (flipX, flipY) {
 
     // bl, tl, tr, br
     return [cc.p(minX, maxY), cc.p(minX, minY), cc.p(maxX, minY), cc.p(maxX, maxY)];
-}
+};
 
 RectGizmo.prototype.update = function () {
     var activeTarget = this._nodes[0];

@@ -1,3 +1,7 @@
+'use strict';
+
+var snapPixelWihVec2 = Editor.GizmosUtils.snapPixelWihVec2;
+
 function NodeGizmo ( gizmosView, node ) {
     this.hovering = false;
     this.selecting = false;
@@ -10,7 +14,12 @@ function NodeGizmo ( gizmosView, node ) {
 
 NodeGizmo.prototype.ensureSelectTool = function () {
     if ( !this._selectTool ) {
-        this._selectTool = this._gizmosView.scene.polygon();
+        this._selectTool = this._gizmosView.scene.group();
+        this._selectTool.bounds = this._selectTool.polygon();
+
+        var errorInfo = this._selectTool.errorInfo = this._selectTool.group();
+        errorInfo.l1 = errorInfo.line( 0, 0, 0, 0 ).stroke( { width: 1, color: '#f00' } );
+        errorInfo.l2 = errorInfo.line( 0, 0, 0, 0 ).stroke( { width: 1, color: '#f00' } );
     }
 };
 
@@ -21,55 +30,54 @@ NodeGizmo.prototype.hideSelectTool = function () {
 };
 
 NodeGizmo.prototype.update = function () {
-    var bounds, v1, v2, v3, v4;
 
-    if ( this.selecting || this.editing ) {
-        this.ensureSelectTool();
+    var editing  = this.selecting || this.editing;
+    var hovering = this.hovering;
+    var sizeNegative = this._node.width < 0 || this._node.height < 0;
 
-        bounds = this._node.getWorldOrientedBounds();
-        v1 = this._gizmosView.worldToPixel(bounds[0]);
-        v2 = this._gizmosView.worldToPixel(bounds[1]);
-        v3 = this._gizmosView.worldToPixel(bounds[2]);
-        v4 = this._gizmosView.worldToPixel(bounds[3]);
-
-        this._selectTool.show();
-        this._selectTool.plot([
-            [Editor.GizmosUtils.snapPixel(v1.x), Editor.GizmosUtils.snapPixel(v1.y)],
-            [Editor.GizmosUtils.snapPixel(v2.x), Editor.GizmosUtils.snapPixel(v2.y)],
-            [Editor.GizmosUtils.snapPixel(v3.x), Editor.GizmosUtils.snapPixel(v3.y)],
-            [Editor.GizmosUtils.snapPixel(v4.x), Editor.GizmosUtils.snapPixel(v4.y)],
-        ])
-        .fill('none')
-        .stroke({color: '#09f', width: 1})
-        ;
-
-        return;
-    }
-    else if ( this.hovering ) {
-        this.ensureSelectTool();
-
-        bounds = this._node.getWorldOrientedBounds();
-        v1 = this._gizmosView.worldToPixel(bounds[0]);
-        v2 = this._gizmosView.worldToPixel(bounds[1]);
-        v3 = this._gizmosView.worldToPixel(bounds[2]);
-        v4 = this._gizmosView.worldToPixel(bounds[3]);
-
-        this._selectTool.show();
-        this._selectTool.plot([
-            [Editor.GizmosUtils.snapPixel(v1.x), Editor.GizmosUtils.snapPixel(v1.y)],
-            [Editor.GizmosUtils.snapPixel(v2.x), Editor.GizmosUtils.snapPixel(v2.y)],
-            [Editor.GizmosUtils.snapPixel(v3.x), Editor.GizmosUtils.snapPixel(v3.y)],
-            [Editor.GizmosUtils.snapPixel(v4.x), Editor.GizmosUtils.snapPixel(v4.y)],
-        ])
-        .fill('none')
-        .stroke({color: '#999', width: 1})
-        ;
-
-        return;
-    }
-    else {
+    if (!editing && !hovering && !sizeNegative) {
         this.hideSelectTool();
         return;
+    }
+
+    this.ensureSelectTool();
+    this._selectTool.show();
+
+    var bounds = this._node.getWorldOrientedBounds();
+    var v1 = snapPixelWihVec2( this._gizmosView.worldToPixel(bounds[0]) );
+    var v2 = snapPixelWihVec2( this._gizmosView.worldToPixel(bounds[1]) );
+    var v3 = snapPixelWihVec2( this._gizmosView.worldToPixel(bounds[2]) );
+    var v4 = snapPixelWihVec2( this._gizmosView.worldToPixel(bounds[3]) );
+
+    if (sizeNegative) {
+        var errorInfo = this._selectTool.errorInfo.show();
+        errorInfo.l1.plot(v1.x, v1.y, v3.x, v3.y);
+        errorInfo.l2.plot(v4.x, v4.y, v2.x, v2.y);
+    }
+    else {
+        this._selectTool.errorInfo.hide();
+    }
+
+    if (editing || hovering) {
+        this._selectTool.bounds.show();
+
+        this._selectTool.bounds.plot([
+            [v1.x, v1.y],
+            [v2.x, v2.y],
+            [v3.x, v3.y],
+            [v4.x, v4.y]
+        ])
+        .fill('none');
+
+        if ( editing ) {
+            this._selectTool.bounds.stroke({color: '#09f', width: 1});
+        }
+        else if ( hovering ) {
+            this._selectTool.bounds.stroke({color: '#999', width: 1});
+        }
+    }
+    else {
+        this._selectTool.bounds.hide();
     }
 };
 
