@@ -58,6 +58,12 @@ GizmosUtils.snapPixel = function (p) {
     return Math.floor(p) + 0.5;
 };
 
+GizmosUtils.snapPixelWihVec2 = function (vec2) {
+    vec2.x = GizmosUtils.snapPixel(vec2.x);
+    vec2.y = GizmosUtils.snapPixel(vec2.y);
+    return vec2;
+};
+
 GizmosUtils.getCenter = function ( nodes ) {
     var minX = null, minY = null, maxX = null, maxY = null;
     for ( var i = 0; i < nodes.length; ++i ) {
