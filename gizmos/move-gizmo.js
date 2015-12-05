@@ -3,11 +3,11 @@ function MoveGizmo ( gizmosView, nodes ) {
         self = this
         ;
 
-    var mappingH = cc.Runtime.Settings['mapping-h'];
-    var mappingV = cc.Runtime.Settings['mapping-v'];
+    var mappingH = [0,1,1];
+    var mappingV = [1,0,1];
 
-    this.xDirection = (mappingH[1] - mappingH[0]) > 0 ? 1 : -1;
-    this.yDirection = (mappingV[1] - mappingV[0]) > 0 ? 1 : -1;
+    this.xDirection = mappingH[1] > mappingH[0] ? 1 : -1;
+    this.yDirection = mappingV[1] > mappingV[0] ? 1 : -1;
 
     this._gizmosView = gizmosView;
     this._nodes = nodes;
@@ -26,24 +26,34 @@ function MoveGizmo ( gizmosView, nodes ) {
 
             var delta = new cc.Vec2(dx / self._gizmosView.scale, dy / self._gizmosView.scale);
 
+            self._nodes.forEach( node => {
+                self._gizmosView.undo.recordObject( node.uuid );
+            });
+
             for (var i = 0; i < scenePosList.length; ++i) {
                 self._nodes[i].scenePosition = scenePosList[i].add(delta);
             }
 
             self._gizmosView.repaintHost();
-        }
+        },
+
+        end: function () {
+            self._gizmosView.undo.commit();
+        },
     });
 }
 
 MoveGizmo.prototype.update = function () {
-    if ( this._nodes.length === 0 ) {
+    var activeTarget = this._nodes[0];
+    var isTargetValid = activeTarget && activeTarget.isValid;
+
+    if (!isTargetValid) {
         this._positionTool.hide();
         return;
     }
 
     this._positionTool.show();
 
-    var activeTarget = this._nodes[0];
     var scenePos, screenPos, rotation;
 
     if (this._gizmosView.pivot === 'center') {

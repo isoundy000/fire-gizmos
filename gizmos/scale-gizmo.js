@@ -16,7 +16,8 @@ function ScaleGizmo ( gizmosView, nodes ) {
             localscaleList = [];
 
             for (i = 0; i < self._nodes.length; ++i) {
-                localscaleList.push(self._nodes[i].scale);
+                var node = self._nodes[i];
+                localscaleList.push(cc.v2(node.scaleX, node.scaleY));
             }
 
             if (self._gizmosView.pivot === 'center') {
@@ -29,6 +30,10 @@ function ScaleGizmo ( gizmosView, nodes ) {
         },
 
         update: function (dx, dy) {
+            self._nodes.forEach( node => {
+                self._gizmosView.undo.recordObject( node.uuid );
+            });
+
             var i, scale;
 
             scale = cc.v2(1.0 + dx, 1.0 - dy);
@@ -57,19 +62,25 @@ function ScaleGizmo ( gizmosView, nodes ) {
             }
 
             self._gizmosView.repaintHost();
-        }
+        },
+
+        end: function () {
+            self._gizmosView.undo.commit();
+        },
     });
 }
 
 ScaleGizmo.prototype.update = function () {
-    if ( this._nodes.length === 0 ) {
+    var activeTarget = this._nodes[0];
+    var isTargetValid = activeTarget && activeTarget.isValid;
+
+    if (!isTargetValid) {
         this._scaleTool.hide();
         return;
     }
 
     this._scaleTool.show();
 
-    var activeTarget = this._nodes[0];
     var scenePos, screenPos, rotation;
 
     if (this._gizmosView.pivot === 'center') {

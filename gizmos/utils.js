@@ -1,8 +1,17 @@
+'use strict';
+
+const Chroma = require('chroma-js');
+
 var GizmosUtils = {};
 module.exports = GizmosUtils;
 
-function _addMoveHandles ( gizmo, callbacks ) {
+function _addMoveHandles ( gizmo, cursor, callbacks ) {
     var pressx, pressy;
+
+    if (typeof cursor !== 'string') {
+        callbacks = cursor;
+        cursor = 'default';
+    }
 
     //
     var mousemoveHandle = function(event) {
@@ -33,7 +42,7 @@ function _addMoveHandles ( gizmo, callbacks ) {
             pressx = event.clientX;
             pressy = event.clientY;
 
-            EditorUI.addDragGhost("default");
+            EditorUI.addDragGhost(cursor);
             document.addEventListener ( 'mousemove', mousemoveHandle );
             document.addEventListener ( 'mouseup', mouseupHandle );
 
@@ -47,6 +56,12 @@ function _addMoveHandles ( gizmo, callbacks ) {
 
 GizmosUtils.snapPixel = function (p) {
     return Math.floor(p) + 0.5;
+};
+
+GizmosUtils.snapPixelWihVec2 = function (vec2) {
+    vec2.x = GizmosUtils.snapPixel(vec2.x);
+    vec2.y = GizmosUtils.snapPixel(vec2.y);
+    return vec2;
 };
 
 GizmosUtils.getCenter = function ( nodes ) {
@@ -112,7 +127,7 @@ GizmosUtils.scaleSlider = function ( svg, size, color, callbacks ) {
         event.stopPropagation();
     } );
     group.on( 'mouseover', function ( event ) {
-        var lightColor = chroma(color).brighter().hex();
+        var lightColor = Chroma(color).brighter().hex();
         line.stroke( { color: lightColor } );
         rect.fill( { color: lightColor } );
 
@@ -173,7 +188,7 @@ GizmosUtils.freemoveTool = function ( svg, size, color, callbacks ) {
         event.stopPropagation();
     } );
     circle.on( 'mouseover', function ( event ) {
-        var lightColor = chroma(color).brighter().hex();
+        var lightColor = Chroma(color).brighter().hex();
         this.fill( { color: lightColor } )
             .stroke( { color: lightColor } )
             ;
@@ -238,7 +253,7 @@ GizmosUtils.arrowTool = function ( svg, size, color, callbacks ) {
         event.stopPropagation();
     } );
     group.on( 'mouseover', function ( event ) {
-        var lightColor = chroma(color).brighter().hex();
+        var lightColor = Chroma(color).brighter().hex();
         line.stroke( { color: lightColor } );
         arrow.fill( { color: lightColor } );
 
@@ -361,7 +376,7 @@ GizmosUtils.positionTool = function ( svg, callbacks ) {
         event.stopPropagation();
     } );
     moveRect.on( 'mouseover', function ( event ) {
-        var lightColor = chroma(color).brighter().hex();
+        var lightColor = Chroma(color).brighter().hex();
         this.fill( { color: lightColor } )
             .stroke( { color: lightColor } )
             ;
@@ -457,7 +472,7 @@ GizmosUtils.rotationTool = function ( svg, callbacks ) {
         event.stopPropagation();
     } );
     group.on( 'mouseover', function ( event ) {
-        var lightColor = chroma(color).brighter().hex();
+        var lightColor = Chroma(color).brighter().hex();
         circle.stroke( { color: lightColor } );
         line.stroke( { color: lightColor } );
         arrow.fill( { color: lightColor } );
@@ -632,7 +647,7 @@ GizmosUtils.scaleTool = function ( svg, callbacks ) {
         event.stopPropagation();
     } );
     scaleRect.on( 'mouseover', function ( event ) {
-        var lightColor = chroma(color).brighter().hex();
+        var lightColor = Chroma(color).brighter().hex();
         this.fill( { color: lightColor } )
             .stroke( { color: lightColor } )
             ;
@@ -694,6 +709,352 @@ GizmosUtils.scaleTool = function ( svg, callbacks ) {
 
     return group;
 };
+
+GizmosUtils.circleTool = function ( svg, size, fill, stroke, cursor, callbacks ) {
+    var point = svg.circle( size )
+                    .fill(fill ? fill : 'none')
+                    .stroke(stroke ? stroke : 'none')
+                    ;
+    var dragging = false;
+
+    point.style( 'pointer-events', 'bounding-box' );
+
+    point.on( 'mousemove', function ( event ) {
+        event.stopPropagation();
+    } );
+    point.on( 'mouseover', function ( event ) {
+        if (fill) {
+            var lightColor = Chroma(fill.color).brighter().hex();
+            point.fill( { color: lightColor } );
+        }
+
+        if (stroke) {
+            var lightColor = Chroma(stroke.color).brighter().hex();
+            point.stroke( { color: lightColor } );
+        }
+
+    } );
+
+    point.on( 'mouseout', function ( event ) {
+        event.stopPropagation();
+
+        if ( !dragging ) {
+            if (fill) point.fill(fill);
+            if (stroke) point.stroke(stroke);
+        }
+    } );
+
+    _addMoveHandles( point, cursor, {
+        start: function () {
+            dragging = true;
+
+            if (fill) {
+                var superLightColor = Chroma(fill.color).brighter().brighter().hex();
+                point.fill( { color: superLightColor } );
+            }
+
+            if (stroke) {
+                var superLightColor = Chroma(stroke.color).brighter().brighter().hex();
+                point.stroke( { color: superLightColor } );
+            }
+
+            if ( callbacks.start )
+                callbacks.start ();
+        },
+
+        update: function ( dx, dy ) {
+            if ( callbacks.update )
+                callbacks.update ( dx, dy );
+        },
+
+        end: function () {
+            dragging = false;
+
+            if (fill) point.fill(fill);
+            if (stroke) point.stroke(stroke);
+
+            if ( callbacks.end )
+                callbacks.end ();
+        }
+    }  );
+
+    return point;
+};
+
+GizmosUtils.lineTool = function ( svg, from, to, color, cursor, callbacks ) {
+    var group = svg.group();
+    var line = group.line( from.x, from.y, to.x, to.y )
+                    .stroke({ width: 1, color: color })
+                    ;
+    // used for hit test
+    var bgline = group.line( from.x, from.y, to.x, to.y)
+                    .stroke({ width: 8, color: color })
+                    .style('stroke-opacity', 0)
+                    ;
+    var dragging = false;
+
+    group.on( 'mousemove', function ( event ) {
+        event.stopPropagation();
+    } );
+    group.on( 'mouseover', function ( event ) {
+        var lightColor = Chroma(color).brighter().hex();
+        line.stroke( { color: lightColor } );
+    } );
+
+    group.on( 'mouseout', function ( event ) {
+        event.stopPropagation();
+
+        if ( !dragging ) {
+            line.stroke( { color: color } );
+        }
+    } );
+
+    _addMoveHandles( group, cursor, {
+        start: function () {
+            dragging = true;
+
+            var superLightColor = Chroma(color).brighter().brighter().hex();
+            line.stroke( { color: superLightColor } );
+
+            if ( callbacks.start )
+                callbacks.start ();
+        },
+
+        update: function ( dx, dy ) {
+            if ( callbacks.update )
+                callbacks.update ( dx, dy );
+        },
+
+        end: function () {
+            dragging = false;
+            line.stroke( { color: color } );
+
+            if ( callbacks.end )
+                callbacks.end ();
+        }
+    } );
+
+    group.plot = function () {
+        line.plot.apply(line, arguments);
+        bgline.plot.apply(bgline, arguments);
+    };
+
+    return group;
+};
+
+GizmosUtils.positionLineTool = function ( svg, origin, pos, local, lineColor, textColor ) {
+    var group = svg.group();
+
+    var xLine = group.line( origin.x, pos.y, pos.x, pos.y )
+                    .stroke({ width: 1, color: lineColor });
+    var yLine = group.line( pos.x, origin.y, pos.x, pos.y )
+                    .stroke({ width: 1, color: lineColor });
+
+    var xText = group.text('' + local.x).fill(textColor);
+    var yText = group.text('' + local.y).fill(textColor);
+
+    group.style('stroke-dasharray', '5 5');
+    group.style('stroke-opacity', 0.8);
+
+    group.plot = function (origin, pos, local) {
+        xLine.plot.call(yLine, origin.x, pos.y, pos.x, pos.y);
+        yLine.plot.call(xLine, pos.x, origin.y, pos.x, pos.y);
+
+        xText.text('' + Math.floor(local.x)).move(origin.x + (pos.x - origin.x) / 2, pos.y);
+        yText.text('' + Math.floor(local.y)).move(pos.x, origin.y + (pos.y - origin.y) / 2);
+    };
+
+    return group;
+};
+
+var RectToolType = {
+    None: 0,
+
+    LeftBottom: 1,
+    LeftTop: 2,
+    RightTop: 3,
+    RightBottom: 4,
+
+    Left: 5,
+    Right: 6,
+    Top: 7,
+    Bottom: 8,
+
+    Center: 9,
+
+    Anchor: 10
+};
+
+GizmosUtils.rectTool = function (svg, callbacks) {
+    var group = svg.group();
+    var sizeGroup = group.group();
+    var lb, lt, rt, rb;     // size points
+    var l, t, r, b;         // size sides
+    var rect;               // center rect
+    var anchor;             // anchor
+    var positionLineTool;   // show dash line along x,y direction
+    var sizeTextGroup, widthText, heightText;   // show size info when resize
+    var smallDragCircle;    // show when rect is too small
+
+    group.position = cc.v2(0,0);
+    group.rotation = 0.0;
+
+    group.type = RectToolType.None;
+
+    function creatToolCallbacks (type) {
+        return {
+            start: function () {
+                group.type = type;
+
+                if ( callbacks.start )
+                    callbacks.start.call(group, type);
+            },
+            update: function ( dx, dy ) {
+                if ( callbacks.update ) {
+                    callbacks.update.call(group, type, dx, dy);
+                }
+            },
+            end: function () {
+                group.type = RectToolType.None;
+
+                if ( callbacks.end )
+                    callbacks.end.call(group, type);
+            }
+        };
+    }
+
+
+    // init center rect
+    rect = group.polygon('0,0,0,0,0,0')
+                .fill('none')
+                .stroke('none')
+                ;
+
+    rect.style( 'pointer-events', 'fill' );
+
+    _addMoveHandles( rect, creatToolCallbacks(RectToolType.Center) );
+
+    // init small darg circle
+    var smallDragCircleSize = 20;
+
+    smallDragCircle = GizmosUtils.circleTool(
+        group,
+        smallDragCircleSize,
+        {color: '#eee', opacity: 0.3},
+        {color: '#eee', opacity: 0.5, width: 2},
+        creatToolCallbacks(RectToolType.Center)
+    );
+
+    // init sides
+    function createLineTool(type, cursor) {
+        return GizmosUtils.lineTool( sizeGroup, cc.v2(0,0), cc.v2(0,0), '#8c8c8c', cursor, creatToolCallbacks(type)).style('cursor', cursor);
+    }
+
+    l = createLineTool(RectToolType.Left, 'col-resize');
+    t = createLineTool(RectToolType.Top, 'row-resize');
+    r = createLineTool(RectToolType.Right, 'col-resize');
+    b = createLineTool(RectToolType.Bottom, 'row-resize');
+
+    // init points
+    var pointSize = 8;
+
+    function createPointTool(type, cursor) {
+        return GizmosUtils.circleTool( sizeGroup, pointSize, {color: '#0e6dde'}, null, cursor, creatToolCallbacks(type)).style('cursor', cursor);
+    }
+
+    lb = createPointTool(RectToolType.LeftBottom, 'nwse-resize');
+    lt = createPointTool(RectToolType.LeftTop, 'nesw-resize');
+    rt = createPointTool(RectToolType.RightTop, 'nwse-resize');
+    rb = createPointTool(RectToolType.RightBottom, 'nesw-resize');
+
+    // init position line tool
+    positionLineTool = GizmosUtils.positionLineTool(group, cc.v2(0,0), cc.v2(0,0), cc.v2(0,0), '#8c8c8c', '#eee');
+
+    // init anchor
+    var anchorSize = 10;
+    anchor = GizmosUtils.circleTool( group, anchorSize, null, {width: 3, color: '#0e6dde'}, creatToolCallbacks(RectToolType.Anchor))
+        .style('cursor', 'pointer');
+
+    //init size text
+    sizeTextGroup = group.group();
+    widthText = sizeTextGroup.text('0').fill('#eee');
+    heightText = sizeTextGroup.text('0').fill('#eee');
+
+    // set bounds
+    group.setBounds = function (bounds) {
+
+        if (Math.abs(bounds[2].x - bounds[0].x) < 10 &&
+            Math.abs(bounds[2].y - bounds[0].y) < 10) {
+
+            sizeGroup.hide();
+            anchor.hide();
+            smallDragCircle.show();
+
+            smallDragCircle.center(
+                bounds[0].x + (bounds[2].x - bounds[0].x)/2,
+                bounds[0].y + (bounds[2].y - bounds[0].y)/2
+            );
+        }
+        else {
+            sizeGroup.show();
+            smallDragCircle.hide();
+
+            rect.plot([
+                [bounds[0].x, bounds[0].y],
+                [bounds[1].x, bounds[1].y],
+                [bounds[2].x, bounds[2].y],
+                [bounds[3].x, bounds[3].y]
+            ]);
+
+            l.plot(bounds[0].x, bounds[0].y, bounds[1].x, bounds[1].y);
+            t.plot(bounds[1].x, bounds[1].y, bounds[2].x, bounds[2].y);
+            r.plot(bounds[2].x, bounds[2].y, bounds[3].x, bounds[3].y);
+            b.plot(bounds[3].x, bounds[3].y, bounds[0].x, bounds[0].y);
+
+            lb.center(bounds[0].x, bounds[0].y);
+            lt.center(bounds[1].x, bounds[1].y);
+            rt.center(bounds[2].x, bounds[2].y);
+            rb.center(bounds[3].x, bounds[3].y);
+
+            if (bounds.anchor) {
+                anchor.show();
+                anchor.center(bounds.anchor.x, bounds.anchor.y);
+            }
+            else {
+                anchor.hide();
+            }
+        }
+
+        if (bounds.origin &&
+            (group.type === RectToolType.Center ||
+             group.type === RectToolType.Anchor)) {
+            positionLineTool.show();
+            positionLineTool.plot(bounds.origin, bounds.anchor, bounds.localPosition);
+        }
+        else {
+            positionLineTool.hide();
+        }
+
+        if (bounds.localSize &&
+            group.type >= RectToolType.LeftBottom &&
+            group.type <= RectToolType.Bottom) {
+            sizeTextGroup.show();
+
+            widthText.text('' + Math.floor(bounds.localSize.width));
+            heightText.text('' + Math.floor(bounds.localSize.height));
+
+            widthText.center(bounds[1].x + (bounds[2].x - bounds[1].x)/2, bounds[1].y + (bounds[2].y - bounds[1].y)/2 + 5);
+            heightText.center(bounds[2].x + (bounds[3].x - bounds[2].x)/2 + 15, bounds[2].y + (bounds[3].y - bounds[2].y)/2);
+        }
+        else {
+            sizeTextGroup.hide();
+        }
+    };
+
+    return group;
+};
+
+GizmosUtils.rectTool.Type = RectToolType;
 
 GizmosUtils.icon = function ( svg, url, w, h, hoverNode ) {
     var icon = svg.image(url)

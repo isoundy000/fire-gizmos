@@ -1,4 +1,8 @@
 (function () {
+'use strict';
+
+const SVG = require('svg.js');
+
 Editor.registerElement({
     properties: {
         scale: {
@@ -30,9 +34,6 @@ Editor.registerElement({
                 return [ 640, 480 ];
             }
         },
-    },
-
-    created: function () {
     },
 
     ready: function () {
@@ -121,7 +122,7 @@ Editor.registerElement({
         this._designRect
             .move( x, y )
             .size( w, h )
-            .fill( { opacity: 0.0 } )
+            .fill('none')
             .stroke( { width: 1, color: '#f0f', opacity: 0.8 } )
             ;
     },
@@ -241,7 +242,7 @@ Editor.registerElement({
         }
 
         if ( nodes.length === 1 ) {
-            node = nodes[0];
+            var node = nodes[0];
             if ( node.gizmo ) {
                 node.gizmo.selecting = false;
                 node.gizmo.editing = true;
@@ -254,6 +255,7 @@ Editor.registerElement({
             case 'move': gizmoDef = Editor.gizmos.move; break;
             case 'rotate': gizmoDef = Editor.gizmos.rotate; break;
             case 'scale': gizmoDef = Editor.gizmos.scale; break;
+            case 'rect': gizmoDef = Editor.gizmos.rect; break;
         }
 
         if ( !gizmoDef ) {
