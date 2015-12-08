@@ -2,9 +2,7 @@
 
 var RectToolType = Editor.GizmosUtils.rectTool.Type;
 var v2 = cc.v2;
-var snapPixel = Editor.GizmosUtils.snapPixel;
 var snapPixelWihVec2 = Editor.GizmosUtils.snapPixelWihVec2;
-
 
 function boundsToRect (bounds) {
     return cc.rect(
@@ -45,7 +43,7 @@ function RectGizmo ( gizmosView, nodes ) {
         var pos = worldPosList[0].add(delta);
         node.worldPosition = pos;
 
-        var parent2nodeTransform  = node.getParentToNodeTransform();
+        var parent2nodeTransform  = cc.affineTransformClone(node.getParentToNodeTransform());
         parent2nodeTransform.tx   = parent2nodeTransform.ty = 0;
 
         // compute position
@@ -120,8 +118,8 @@ function RectGizmo ( gizmosView, nodes ) {
         var node = self._nodes[0];
 
         // compute transform
-        var world2nodeTransform  = node.getWorldToNodeTransform();
-        var node2parentTransform = node.getNodeToParentTransform();
+        var world2nodeTransform  = cc.affineTransformClone(node.getWorldToNodeTransform());
+        var node2parentTransform = cc.affineTransformClone(node.getNodeToParentTransform());
 
         world2nodeTransform.tx   = world2nodeTransform.ty = 0;
         node2parentTransform.tx  = node2parentTransform.ty = 0;
@@ -186,7 +184,7 @@ function RectGizmo ( gizmosView, nodes ) {
             sd.y = sd.y * hp * heightDirection;
 
             // make transform
-            var world2nodeTransform = node.getWorldToNodeTransform();
+            var world2nodeTransform = cc.affineTransformClone(node.getWorldToNodeTransform());
             world2nodeTransform.tx = world2nodeTransform.ty = 0;
             world2nodeTransform.a = Math.abs(world2nodeTransform.a);
             world2nodeTransform.b = Math.abs(world2nodeTransform.b);
