@@ -76,7 +76,21 @@ Editor.registerElement({
             this._transformGizmo.update();
         }
 
-        this.updateDesignRect();
+        var shouldDisplayDesignRect = !!cc.Canvas.instance;
+        if (this._designRect) {
+            var displayNow = this._designRect.visible();
+            if (displayNow !== shouldDisplayDesignRect) {
+                if (shouldDisplayDesignRect) {
+                    this._designRect.show();
+                }
+                else {
+                    this._designRect.hide();
+                }
+            }
+        }
+        if (shouldDisplayDesignRect) {
+            this.updateDesignRect();
+        }
     },
 
     repaintHost: function () {
