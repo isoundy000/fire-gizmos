@@ -32,7 +32,7 @@ function ScaleGizmo ( gizmosView, nodes ) {
 
         update: function (dx, dy) {
             self._nodes.forEach( node => {
-                self._gizmosView.undo.recordObject( node.uuid );
+                _Scene.Undo.recordObject( node.uuid );
             });
 
             var i, scale;
@@ -66,9 +66,8 @@ function ScaleGizmo ( gizmosView, nodes ) {
         },
 
         end: function () {
-            self._gizmosView.undo.commit();
-
             Editor.sendToWindows('gizmos:end-operation');
+            _Scene.Undo.commit();
         },
     });
 }

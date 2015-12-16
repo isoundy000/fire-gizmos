@@ -32,7 +32,7 @@ function RotateGizmo ( gizmosView, nodes ) {
 
         update: function (delta) {
             self._nodes.forEach( node => {
-                self._gizmosView.undo.recordObject( node.uuid );
+                _Scene.Undo.recordObject( node.uuid );
             });
 
             var i, rot, deltaInt;
@@ -78,9 +78,9 @@ function RotateGizmo ( gizmosView, nodes ) {
                     ;
             }
             self._rotating = false;
-            self._gizmosView.undo.commit();
 
             Editor.sendToWindows('gizmos:end-operation');
+            _Scene.Undo.commit();
         }
     });
 }

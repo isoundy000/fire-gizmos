@@ -225,7 +225,7 @@ function RectGizmo ( gizmosView, nodes ) {
             var delta = new cc.Vec2(dx, dy);
 
             self._nodes.forEach( node => {
-                self._gizmosView.undo.recordObject( node.uuid );
+                _Scene.Undo.recordObject( node.uuid );
             });
 
             if (type === RectToolType.Anchor) {
@@ -248,9 +248,9 @@ function RectGizmo ( gizmosView, nodes ) {
 
         end: function () {
             self._processing = false;
-            self._gizmosView.undo.commit();
 
             Editor.sendToWindows('gizmos:end-operation');
+            _Scene.Undo.commit();
         },
     });
 }

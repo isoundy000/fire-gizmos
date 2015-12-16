@@ -29,7 +29,7 @@ function MoveGizmo ( gizmosView, nodes ) {
             var delta = new cc.Vec2(dx / self._gizmosView.scale, dy / self._gizmosView.scale);
 
             self._nodes.forEach( node => {
-                self._gizmosView.undo.recordObject( node.uuid );
+                _Scene.Undo.recordObject( node.uuid );
             });
 
             for (var i = 0; i < scenePosList.length; ++i) {
@@ -40,9 +40,8 @@ function MoveGizmo ( gizmosView, nodes ) {
         },
 
         end: function () {
-            self._gizmosView.undo.commit();
-
             Editor.sendToWindows('gizmos:end-operation');
+            _Scene.Undo.commit();
         },
     });
 }
