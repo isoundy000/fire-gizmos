@@ -59,7 +59,7 @@ function TrajectoryGizmo ( gizmosView, node ) {
 TrajectoryGizmo.prototype.show = function (root, clip, childPath) {
     this._selectTool.show();
 
-    var animation = root.getComponent(cc.AnimationComponent);
+    var animation = root.getComponent(cc.Animation);
     this._animationState = animation.getAnimationState(clip.name);
     this._clip = clip;
     this._childPath = childPath;
