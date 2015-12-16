@@ -54,6 +54,8 @@ function _addMoveHandles ( gizmo, cursor, callbacks ) {
     } );
 }
 
+GizmosUtils._addMoveHandles = _addMoveHandles;
+
 GizmosUtils.snapPixel = function (p) {
     return Math.floor(p) + 0.5;
 };
