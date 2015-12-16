@@ -198,6 +198,8 @@ function RectGizmo ( gizmosView, nodes ) {
 
     this._rectTool = Editor.GizmosUtils.rectTool( self._gizmosView.foreground, {
         start: function () {
+            Editor.sendToWindows('gizmos:start-operation');
+
             worldPosList.length = 0;
             sizeList.length = 0;
             localPosList.length = 0;
@@ -246,6 +248,8 @@ function RectGizmo ( gizmosView, nodes ) {
 
         end: function () {
             self._processing = false;
+
+            Editor.sendToWindows('gizmos:end-operation');
             _Scene.Undo.commit();
         },
     });
