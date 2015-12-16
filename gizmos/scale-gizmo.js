@@ -11,6 +11,7 @@ function ScaleGizmo ( gizmosView, nodes ) {
 
     this._scaleTool = Editor.GizmosUtils.scaleTool( self._gizmosView.foreground, {
         start: function () {
+            Editor.sendToWindows('gizmos:start-operation');
             var i;
 
             localscaleList = [];
@@ -66,6 +67,8 @@ function ScaleGizmo ( gizmosView, nodes ) {
 
         end: function () {
             self._gizmosView.undo.commit();
+
+            Editor.sendToWindows('gizmos:end-operation');
         },
     });
 }

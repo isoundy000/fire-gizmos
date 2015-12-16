@@ -10,6 +10,8 @@ function RotateGizmo ( gizmosView, nodes ) {
 
     this._rotationTool = Editor.GizmosUtils.rotationTool( self._gizmosView.foreground, {
         start: function () {
+            Editor.sendToWindows('gizmos:start-operation');
+
             var i;
 
             self._rotating = true;
@@ -77,6 +79,8 @@ function RotateGizmo ( gizmosView, nodes ) {
             }
             self._rotating = false;
             self._gizmosView.undo.commit();
+
+            Editor.sendToWindows('gizmos:end-operation');
         }
     });
 }

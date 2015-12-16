@@ -14,6 +14,8 @@ function MoveGizmo ( gizmosView, nodes ) {
 
     this._positionTool = Editor.GizmosUtils.positionTool( self._gizmosView.foreground, {
         start: function () {
+            Editor.sendToWindows('gizmos:start-operation');
+
             scenePosList.length = 0;
             for (var i = 0; i < self._nodes.length; ++i) {
                 scenePosList.push(self._nodes[i].scenePosition);
@@ -39,6 +41,8 @@ function MoveGizmo ( gizmosView, nodes ) {
 
         end: function () {
             self._gizmosView.undo.commit();
+
+            Editor.sendToWindows('gizmos:end-operation');
         },
     });
 }
