@@ -38,6 +38,10 @@ function _addMoveHandles ( gizmo, cursor, callbacks ) {
     }.bind(gizmo);
 
     gizmo.on( 'mousedown', function ( event ) {
+        if (callbacks.ignoreMouseDown && callbacks.ignoreMouseDown(event)) {
+            return;
+        }
+
         if ( event.which === 1 ) {
             pressx = event.clientX;
             pressy = event.clientY;
@@ -934,7 +938,18 @@ GizmosUtils.rectTool = function (svg, callbacks) {
 
     rect.style( 'pointer-events', 'fill' );
 
-    _addMoveHandles( rect, creatToolCallbacks(RectToolType.Center) );
+    var rectCallBacks = creatToolCallbacks(RectToolType.Center);
+    rectCallBacks.ignoreMouseDown = function (event) {
+        var selection = Editor.Selection.curSelection('node');
+        var node = _Scene.hitTest(event.offsetX, event.offsetY);
+        var index = selection.findIndex(function (id) {
+            return id === node.uuid;
+        });
+
+        return index === -1;
+    };
+
+    _addMoveHandles( rect,  rectCallBacks);
 
     // init small darg circle
     var smallDragCircleSize = 20;
