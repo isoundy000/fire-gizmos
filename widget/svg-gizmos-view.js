@@ -137,7 +137,7 @@ Editor.registerElement({
             .move( x, y )
             .size( w, h )
             .fill('none')
-            .stroke( { width: 1, color: '#f0f', opacity: 0.8 } )
+            .stroke( { width: 1, color: '#a0a', opacity: 1.0 } )
             ;
     },
 
