@@ -346,7 +346,10 @@ RectGizmo.prototype.update = function () {
 };
 
 RectGizmo.prototype.remove = function () {
-    this._rectTool.remove();
+    if (this._rectTool) {
+        this._rectTool.remove();
+        this._rectTool = null;
+    }
 };
 
 module.exports = RectGizmo;

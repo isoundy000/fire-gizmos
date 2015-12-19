@@ -109,7 +109,10 @@ ScaleGizmo.prototype.update = function () {
 };
 
 ScaleGizmo.prototype.remove = function () {
-    this._scaleTool.remove();
+    if (this._scaleTool) {
+        this._scaleTool.remove();
+        this._scaleTool = null;
+    }
 };
 
 module.exports = ScaleGizmo;

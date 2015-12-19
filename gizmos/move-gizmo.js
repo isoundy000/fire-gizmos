@@ -87,7 +87,10 @@ MoveGizmo.prototype.update = function () {
 };
 
 MoveGizmo.prototype.remove = function () {
-    this._positionTool.remove();
+    if (this._positionTool) {
+        this._positionTool.remove();
+        this._positionTool = null;
+    }
 };
 
 module.exports = MoveGizmo;

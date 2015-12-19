@@ -126,7 +126,10 @@ RotateGizmo.prototype.update = function () {
 };
 
 RotateGizmo.prototype.remove = function () {
-    this._rotationTool.remove();
+    if (this._rotationTool) {
+        this._rotationTool.remove();
+        this._rotationTool = null;
+    }
 };
 
 module.exports = RotateGizmo;

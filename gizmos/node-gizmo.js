@@ -84,6 +84,7 @@ NodeGizmo.prototype.update = function () {
 NodeGizmo.prototype.remove = function () {
     if ( this._selectTool ) {
         this._selectTool.remove();
+        this._selectTool = null;
     }
 };
 
