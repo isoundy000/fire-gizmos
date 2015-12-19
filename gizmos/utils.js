@@ -107,8 +107,8 @@ GizmosUtils.getCenter = function ( nodes ) {
     var centerY = (minY + maxY) * 0.5;
 
 
-    var scene = cc.engine.getCurrentScene();
-    var scenePos = scene.transformPointToLocal( cc.v2(centerX,centerY) );
+    var scene = cc.director.getScene();
+    var scenePos = scene.convertToNodeSpaceAR( cc.v2(centerX,centerY) );
     return scenePos;
 };
 
