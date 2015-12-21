@@ -61,7 +61,7 @@ function RotateGizmo ( gizmosView, nodes ) {
 
             self._gizmosView.repaintHost();
 
-            _Scene.recordNodeChanged(self._nodes);
+            _Scene.AnimUtils.recordNodeChanged(self._nodes);
         },
 
         end: function () {
