@@ -156,8 +156,8 @@ GizmosUtils.scaleSlider = function ( svg, size, color, callbacks ) {
     _addMoveHandles( group, {
         start: function () {
             dragging = true;
-            line.stroke( { color: "#ff0" } );
-            rect.fill( { color: "#ff0" } );
+            line.stroke( { color: '#ff0' } );
+            rect.fill( { color: '#ff0' } );
 
             if ( callbacks.start )
                 callbacks.start ();
@@ -216,8 +216,8 @@ GizmosUtils.freemoveTool = function ( svg, size, color, callbacks ) {
     _addMoveHandles( circle, {
         start: function ( x, y ) {
             dragging = true;
-            this.fill( { color: "#cc5" } )
-                .stroke( { color: "#cc5" } )
+            this.fill( { color: '#cc5' } )
+                .stroke( { color: '#cc5' } )
                 ;
 
             if ( callbacks.start )
@@ -282,8 +282,8 @@ GizmosUtils.arrowTool = function ( svg, size, color, callbacks ) {
     _addMoveHandles( group, {
         start: function () {
             dragging = true;
-            line.stroke( { color: "#ff0" } );
-            arrow.fill( { color: "#ff0" } );
+            line.stroke( { color: '#ff0' } );
+            arrow.fill( { color: '#ff0' } );
 
             if ( callbacks.start )
                 callbacks.start ();
@@ -315,13 +315,13 @@ GizmosUtils.positionTool = function ( svg, callbacks ) {
     group.rotation = 0.0;
 
     // x-arrow
-    xarrow = GizmosUtils.arrowTool( svg, 80, "#f00", {
+    xarrow = GizmosUtils.arrowTool( svg, 80, '#f00', {
         start: function () {
             if ( callbacks.start )
                 callbacks.start.call(group);
         },
         update: function ( dx, dy ) {
-            var radius = Math.deg2rad(group.rotation);
+            var radius = Editor.Math.deg2rad(group.rotation);
             var dirx = Math.cos(radius);
             var diry = Math.sin(radius);
 
@@ -342,13 +342,13 @@ GizmosUtils.positionTool = function ( svg, callbacks ) {
     group.add(xarrow);
 
     // y-arrow
-    yarrow = GizmosUtils.arrowTool( svg, 80, "#5c5", {
+    yarrow = GizmosUtils.arrowTool( svg, 80, '#5c5', {
         start: function () {
             if ( callbacks.start )
                 callbacks.start.call(group);
         },
         update: function ( dx, dy ) {
-            var radius = Math.deg2rad(group.rotation + 90.0);
+            var radius = Editor.Math.deg2rad(group.rotation + 90.0);
             var dirx = Math.cos(radius);
             var diry = Math.sin(radius);
 
@@ -370,7 +370,7 @@ GizmosUtils.positionTool = function ( svg, callbacks ) {
     group.add(yarrow);
 
     // move rect
-    var color = "#05f";
+    var color = '#05f';
     var dragging = false;
     moveRect = group.rect( 20, 20 )
                         .move( 0, -20 )
@@ -405,8 +405,8 @@ GizmosUtils.positionTool = function ( svg, callbacks ) {
     _addMoveHandles( moveRect, {
         start: function () {
             dragging = true;
-            this.fill( { color: "#cc5" } )
-                .stroke( { color: "#cc5" } )
+            this.fill( { color: '#cc5' } )
+                .stroke( { color: '#cc5' } )
                 ;
 
             if ( callbacks.start )
@@ -436,14 +436,14 @@ GizmosUtils.rotationTool = function ( svg, callbacks ) {
     var group = svg.group();
     var circle, line, arrow, arc, txtDegree;
     var dragging = false;
-    var color = "#f00";
+    var color = '#f00';
 
     group.position = new cc.Vec2(0,0);
     group.rotation = 0.0;
 
     // circle
     circle = group.path('M50,-10 A50,50, 0 1,0 50,10')
-                  .fill( "none" )
+                  .fill( 'none' )
                   .stroke( { width: 2, color: color } )
                   ;
 
@@ -463,9 +463,9 @@ GizmosUtils.rotationTool = function ( svg, callbacks ) {
                  ;
 
     //
-    txtDegree = group.text("0")
-                     .plain("")
-                     .fill( { color: "white" } )
+    txtDegree = group.text('0')
+                     .plain('')
+                     .fill( { color: 'white' } )
                      .font( {
                          anchor: 'middle',
                      })
@@ -503,14 +503,14 @@ GizmosUtils.rotationTool = function ( svg, callbacks ) {
     _addMoveHandles( group, {
         start: function ( x, y ) {
             dragging = true;
-            circle.stroke( { color: "#cc5" } );
-            line.stroke( { color: "#cc5" } );
-            arrow.fill( { color: "#cc5" } );
+            circle.stroke( { color: '#cc5' } );
+            line.stroke( { color: '#cc5' } );
+            arrow.fill( { color: '#cc5' } );
 
             arc.show();
             arc.plot( 'M40,0 A40,40, 0 0,1 40,0 L0,0 Z' );
 
-            txtDegree.plain("0\xB0");
+            txtDegree.plain('0\xB0');
             txtDegree.rotate(0, -30, 0);
             txtDegree.show();
 
@@ -536,23 +536,23 @@ GizmosUtils.rotationTool = function ( svg, callbacks ) {
 
                 var dirx = Math.cos(alpha);
                 var diry = Math.sin(alpha);
-                var angle = Math.rad2deg(alpha);
+                var angle = Editor.Math.rad2deg(alpha);
 
                 txtDegree.rotate(angle, -30, 0);
                 if ( alpha > 0.0 ) {
                     arc.plot( 'M40,0 A40,40, 0 0,1 ' + dirx*40 + ',' + diry*40 + ' L0,0' );
-                    txtDegree.plain( "+" + angle.toFixed(0) + "\xB0" );
+                    txtDegree.plain( '+' + angle.toFixed(0) + '\xB0' );
                 }
                 else {
                     arc.plot( 'M40,0 A40,40, 0 0,0 ' + dirx*40 + ',' + diry*40 + ' L0,0' );
-                    txtDegree.plain( angle.toFixed(0) + "\xB0" );
+                    txtDegree.plain( angle.toFixed(0) + '\xB0' );
                 }
             }
 
             //
             var theta = Math.atan2( v1.y, v1.x ) - Math.atan2( v2.y, v2.x );
             if ( callbacks.update )
-                callbacks.update.call(group, Math.rad2deg(theta) );
+                callbacks.update.call(group, Editor.Math.rad2deg(theta) );
         },
 
         end: function () {
@@ -580,7 +580,7 @@ GizmosUtils.scaleTool = function ( svg, callbacks ) {
     group.rotation = 0.0;
 
     // x-slider
-    xarrow = GizmosUtils.scaleSlider( svg, 100, "#f00", {
+    xarrow = GizmosUtils.scaleSlider( svg, 100, '#f00', {
         start: function () {
             if ( callbacks.start )
                 callbacks.start.call(group);
@@ -610,7 +610,7 @@ GizmosUtils.scaleTool = function ( svg, callbacks ) {
     group.add(xarrow);
 
     // y-slider
-    yarrow = GizmosUtils.scaleSlider( svg, 100, "#5c5", {
+    yarrow = GizmosUtils.scaleSlider( svg, 100, '#5c5', {
         start: function () {
             if ( callbacks.start )
                 callbacks.start.call(group);
@@ -642,7 +642,7 @@ GizmosUtils.scaleTool = function ( svg, callbacks ) {
 
 
     // scaleRect
-    var color = "#aaa";
+    var color = '#aaa';
     var dragging = false;
     scaleRect = group.rect( 20, 20 )
                         .move( -10, -10 )
@@ -676,8 +676,8 @@ GizmosUtils.scaleTool = function ( svg, callbacks ) {
     _addMoveHandles( scaleRect, {
         start: function () {
             dragging = true;
-            this.fill( { color: "#cc5" } )
-                .stroke( { color: "#cc5" } )
+            this.fill( { color: '#cc5' } )
+                .stroke( { color: '#cc5' } )
                 ;
 
             if ( callbacks.start )
