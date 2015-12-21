@@ -33,13 +33,14 @@ function MoveGizmo ( gizmosView, nodes ) {
             });
 
             var pos;
+            var minDifference = Editor.Math.numOfDecimalsF(1.0/self._gizmosView.scale);
             for (var i = 0; i < scenePosList.length; ++i) {
                 self._nodes[i].scenePosition = scenePosList[i].add(delta);
 
                 pos = self._nodes[i].position;
                 self._nodes[i].position = cc.v2(
-                    parseFloat(pos.x.toFixed(2)),
-                    parseFloat(pos.y.toFixed(2))
+                    Editor.Math.toPrecision(pos.x, minDifference),
+                    Editor.Math.toPrecision(pos.y, minDifference)
                 );
             }
 
