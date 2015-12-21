@@ -63,6 +63,8 @@ function ScaleGizmo ( gizmosView, nodes ) {
             }
 
             self._gizmosView.repaintHost();
+
+            _Scene.AnimUtils.recordNodeChanged(self._nodes);
         },
 
         end: function () {
