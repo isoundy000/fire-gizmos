@@ -38,10 +38,7 @@ function MoveGizmo ( gizmosView, nodes ) {
                 self._nodes[i].scenePosition = scenePosList[i].add(delta);
 
                 pos = self._nodes[i].position;
-                self._nodes[i].position = cc.v2(
-                    Editor.Math.toPrecision(pos.x, minDifference),
-                    Editor.Math.toPrecision(pos.y, minDifference)
-                );
+                _Scene.adjustNodePosition(self._nodes[i], minDifference);
             }
 
             self._gizmosView.repaintHost();

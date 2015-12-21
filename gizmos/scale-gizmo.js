@@ -37,7 +37,6 @@ function ScaleGizmo ( gizmosView, nodes ) {
 
             var i;
             var scale = cc.v2(1.0 + dx, 1.0 - dy);
-            var pos;
 
             if (self._gizmosView.pivot === 'center') {
                 for (i = 0; i < localscaleList.length; ++i) {
@@ -51,12 +50,7 @@ function ScaleGizmo ( gizmosView, nodes ) {
                         offsetList[i].y * scale.y
                     );
                     self._nodes[i].scenePosition = center.add(offset);
-
-                    pos = self._nodes[i].position;
-                    self._nodes[i].position = cc.v2(
-                        Editor.Math.toPrecision(pos.x, 2),
-                        Editor.Math.toPrecision(pos.y, 2)
-                    );
+                    _Scene.adjustNodePosition(self._nodes[i], 2);
                 }
             }
             else {
