@@ -41,10 +41,10 @@ function RotateGizmo ( gizmosView, nodes ) {
 
             if (self._gizmosView.pivot === 'center') {
                 for (i = 0; i < rotList.length; ++i) {
-                    rot = Math.deg180(rotList[i] - deltaInt);
+                    rot = Editor.Math.deg180(rotList[i] - deltaInt);
                     rot = Math.floor(rot);
 
-                    var offset = offsetList[i].rotate(Math.deg2rad(deltaInt));
+                    var offset = offsetList[i].rotate(Editor.Math.deg2rad(deltaInt));
                     self._nodes[i].scenePosition = center.add(offset);
                     self._nodes[i].rotation = rot;
 
@@ -53,7 +53,7 @@ function RotateGizmo ( gizmosView, nodes ) {
             }
             else {
                 for (i = 0; i < rotList.length; ++i) {
-                    rot = Math.deg180(rotList[i] - deltaInt);
+                    rot = Editor.Math.deg180(rotList[i] - deltaInt);
                     rot = Math.floor(rot);
                     self._nodes[i].rotation = rot;
                 }
